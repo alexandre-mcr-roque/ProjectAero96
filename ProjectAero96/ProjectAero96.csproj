@@ -17,6 +17,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="29.2.8" />
+    <PackageReference Include="Syncfusion.Licensing" Version="29.2.8" />
   </ItemGroup>
 
 </Project>

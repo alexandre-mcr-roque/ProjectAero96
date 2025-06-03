@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using ProjectAero96.Data;
 using ProjectAero96.Data.Entities;
 
 namespace ProjectAero96.Helpers
 {
     public interface IUserHelper
     {
+        Task<int> GetUserCountEstimateAsync();
+        Task<IEnumerable<User>> GetUsersAsync();
+        Task<IEnumerable<User>> GetUsersAsync(int pageIndex, int pageCount);
         Task<User?> FindUserByIdAsync(string userId);
         Task<User?> FindUserByEmailAsync(string email);
         Task<IdentityResult> AddUserAsync(User user, string password);

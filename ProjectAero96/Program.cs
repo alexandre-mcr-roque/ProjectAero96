@@ -13,6 +13,9 @@ namespace ProjectAero96
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Set required license keys
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(builder.Configuration["LicenseKeys:Syncfusion"]!);
+
             // Add services to the container.
             builder.Services.AddDbContext<DataContext>(options =>
             {
@@ -50,6 +53,8 @@ namespace ProjectAero96
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseStatusCodePagesWithReExecute("/error/{0}");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

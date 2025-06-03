@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectAero96.Data;
 
@@ -11,9 +12,11 @@ using ProjectAero96.Data;
 namespace ProjectAero96.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250603155714_InitDb")]
+    partial class InitDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,146 +156,6 @@ namespace ProjectAero96.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("ProjectAero96.Data.Entities.Airplane", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AirplaneModelId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ESeats")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FCSeats")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AirplaneModelId");
-
-                    b.ToTable("Airplanes");
-                });
-
-            modelBuilder.Entity("ProjectAero96.Data.Entities.City", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cities");
-                });
-
-            modelBuilder.Entity("ProjectAero96.Data.Entities.Flight", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AirplaneId")
-                        .HasColumnType("int");
-
-                    b.Property<float?>("BabyPriceModifier")
-                        .HasColumnType("real");
-
-                    b.Property<float?>("ChildPriceModifier")
-                        .HasColumnType("real");
-
-                    b.Property<byte>("DaysOfWeek")
-                        .HasColumnType("tinyint");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
-                    b.Property<TimeSpan>("DepartureTime")
-                        .HasColumnType("time");
-
-                    b.Property<decimal>("PricePerTime")
-                        .HasColumnType("decimal(8,2)");
-
-                    b.Property<TimeSpan?>("ReturnTime")
-                        .HasColumnType("time");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AirplaneId");
-
-                    b.ToTable("Flights");
-                });
-
-            modelBuilder.Entity("ProjectAero96.Data.Entities.FlightStop", b =>
-                {
-                    b.Property<int>("FlightId")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("StopIndex")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("CityId")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly?>("FromLastStop")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly?>("ToNextStop")
-                        .HasColumnType("time");
-
-                    b.HasKey("FlightId", "StopIndex");
-
-                    b.HasIndex("CityId");
-
-                    b.ToTable("FlightStops");
-                });
-
-            modelBuilder.Entity("ProjectAero96.Data.Entities.ModelAirplane", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MaxSeats")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModelName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("PricePerTime")
-                        .HasColumnType("decimal(8,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AirplaneModels");
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.User", b =>
@@ -435,50 +298,6 @@ namespace ProjectAero96.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ProjectAero96.Data.Entities.Airplane", b =>
-                {
-                    b.HasOne("ProjectAero96.Data.Entities.ModelAirplane", "AirplaneModel")
-                        .WithMany()
-                        .HasForeignKey("AirplaneModelId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AirplaneModel");
-                });
-
-            modelBuilder.Entity("ProjectAero96.Data.Entities.Flight", b =>
-                {
-                    b.HasOne("ProjectAero96.Data.Entities.Airplane", "Airplane")
-                        .WithMany()
-                        .HasForeignKey("AirplaneId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Airplane");
-                });
-
-            modelBuilder.Entity("ProjectAero96.Data.Entities.FlightStop", b =>
-                {
-                    b.HasOne("ProjectAero96.Data.Entities.City", "City")
-                        .WithMany()
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectAero96.Data.Entities.Flight", null)
-                        .WithMany("FlightStops")
-                        .HasForeignKey("FlightId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("City");
-                });
-
-            modelBuilder.Entity("ProjectAero96.Data.Entities.Flight", b =>
-                {
-                    b.Navigation("FlightStops");
                 });
 #pragma warning restore 612, 618
         }

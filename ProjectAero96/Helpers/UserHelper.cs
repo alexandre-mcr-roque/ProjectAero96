@@ -1,23 +1,50 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ProjectAero96.Data;
 using ProjectAero96.Data.Entities;
+using Syncfusion.EJ2.Linq;
 
 namespace ProjectAero96.Helpers
 {
     public class UserHelper : IUserHelper
     {
+        private readonly DataContext dataContext;
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
         private readonly RoleManager<IdentityRole> roleManager;
 
         public UserHelper(
+            DataContext dataContext,
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             RoleManager<IdentityRole> roleManager)
         {
+            this.dataContext = dataContext;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.roleManager = roleManager;
+        }
+
+        public Task<int> GetUserCountEstimateAsync() => dataContext.GetUserCountEstimateAsync();
+
+        public async Task<IEnumerable<User>> GetUsersAsync()
+        {
+            return await userManager.Users.AsNoTracking().ToListAsync();
+        }
+
+        // TODO test
+        public async Task<IEnumerable<User>> GetUsersAsync(int pageIndex, int pageSize)
+        {
+            var users = userManager.Users.AsNoTracking();
+            if (pageIndex > 1)
+            {
+                users = users.Skip(pageIndex * pageSize);
+            }
+            if (pageSize > 0)
+            {
+                users = users.Take(pageSize);
+            }
+            return await users.ToListAsync();
         }
 
         public async Task<User?> FindUserByIdAsync(string userId)

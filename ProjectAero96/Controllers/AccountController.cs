@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Helpers;
 using ProjectAero96.Models;
-using System.Threading.Tasks;
 
 namespace ProjectAero96.Controllers
 {
@@ -35,7 +34,7 @@ namespace ProjectAero96.Controllers
 
         [Route("signin")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignInAsync([Bind("Email","Password","RememberMe")]SignInViewModel model)
+        public async Task<IActionResult> SignIn([Bind("Email","Password","RememberMe")]SignInViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -70,6 +69,7 @@ namespace ProjectAero96.Controllers
             }
         }
 
+        // TODO cleanup view
         [Route("register")]
         public IActionResult Register()
         {
@@ -118,6 +118,7 @@ namespace ProjectAero96.Controllers
                 model.ConfirmPassword = string.Empty;
                 return View(model);
             }
+            await userHelper.AddUserToRoleAsync(user, Roles.Client);
 
             await SendVerificationEmail(user);
             ViewBag.Summary = FormSummary.Success("An email has been sent to your inbox to complete the registration.");  // Repurposed for success messages

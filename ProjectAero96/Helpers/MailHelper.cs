@@ -1,7 +1,6 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
 using ProjectAero96.Models;
-using System.Net.Mime;
 
 namespace ProjectAero96.Helpers
 {
@@ -23,7 +22,7 @@ namespace ProjectAero96.Helpers
             smtpClient.Connect(smtp, int.Parse(port));
             smtpClient.Authenticate(address, password);
 
-            fromAddress = new MailboxAddress(name,address);
+            fromAddress = new MailboxAddress(name, address);
         }
         public async Task SendEmailAsync(string to, string subject, string body, params IMailFileModel[] attachments)
         {
@@ -34,7 +33,7 @@ namespace ProjectAero96.Helpers
 
             var builder = new BodyBuilder { HtmlBody = $"""
                 <center>
-                    <div style="font-family:Arial,Helvetica,sans-serif;background-color:#efefef;width:fit-content;padding:30px 30px 10px">
+                    <div style="font-family:Arial,Helvetica,sans-serif;background-color:#efefef;width:fit-content;padding:30px 30px 10px;color:#000">
                         <div style="font-size:1.2rem">
                             {body}
                         </div>
@@ -43,7 +42,7 @@ namespace ProjectAero96.Helpers
                     </div>
                 </center>
                 """ };
-            Array.ForEach(attachments, file => builder.Attachments.Add(file.FileName, file.FileData));
+            Array.ForEach(attachments, file => builder.Attachments.Add(file.FileName, file.FileData, ContentType.Parse(file.ContentType)));
 
             message.Body = builder.ToMessageBody();
             await smtpClient.SendAsync(message);

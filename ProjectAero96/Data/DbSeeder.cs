@@ -31,7 +31,7 @@ namespace ProjectAero96.Data
             }
 
             IdentityResult result;
-            var user = await userHelper.FindUserByEmailAsync("alexandre.mcr.roque@gmail.com");
+            var user = await userHelper.FindUserByEmailAsync(adminEmail);
             if (user == null)
             {
                 user = new User
