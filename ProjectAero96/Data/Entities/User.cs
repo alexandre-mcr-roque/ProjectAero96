@@ -11,5 +11,6 @@ namespace ProjectAero96.Data.Entities
         public string City { get; set; } = null!;
         public string Country { get; set; } = null!;
         public bool Deleted { get; set; }
+        public string FullName => $"{FirstName} {LastName}";
     }
 }

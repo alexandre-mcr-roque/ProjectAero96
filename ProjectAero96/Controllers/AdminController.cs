@@ -16,9 +16,30 @@ namespace ProjectAero96.Controllers
             this.adminRepository = adminRepository;
         }
 
-        // TODO make view
+        // TODO fix on load visual bug (fixes itself on window resize for now)
         [Route("admin")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
+        {
+            var user = await userHelper.FindUserByEmailAsync(User.Identity!.Name!);
+            ViewBag.FullName = user!.FullName;
+            return View();
+        }
+
+        // TODO controllers and views
+        [Route("admin/users")]
+        public IActionResult Users()
+        {
+            return View();
+        }
+
+        [Route("admin/airplanes")]
+        public IActionResult Airplanes()
+        {
+            return View();
+        }
+
+        [Route("admin/cities")]
+        public IActionResult Cities()
         {
             return View();
         }

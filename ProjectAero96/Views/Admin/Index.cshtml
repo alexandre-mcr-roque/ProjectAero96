@@ -1,27 +1,28 @@
 ﻿@{
-    Layout = null;
+    Layout = "_AdminSidebar";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Panel - Aero96</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/29.1.33/fluent.css" />
-</head>
-<body>
-    @* Add syncfusion sidebar and dashboard *@
-    <header>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-        </main>
+<div id="dashboard-main-content">
+    <div id="dashboard-content-above">Welcome, @ViewBag.FullName</div>
+    <div id="dashboard-content">
+        <ejs-dashboardlayout id="defaultLayout" columns="3" cellSpacing="[20, 10]" allowDragging="false" allowFloating="false" allowResizing="false" mediaQuery="(max-width: 992px)">
+            <e-content-template>
+                <div id="users" class="e-panel link-admin-users" data-col="0">
+                    <div class="e-panel-container">
+                        <div class="text-align">Users</div>
+                    </div>
+                </div>
+                <div id="items" class="e-panel link-admin-airplanes" data-col="1">
+                    <div class="e-panel-container">
+                        <div class="text-align">Airplanes</div>
+                    </div>
+                </div>
+                <div id="location" class="e-panel link-admin-cities" data-col="2">
+                    <div class="e-panel-container">
+                        <div class="text-align">Cities</div>
+                    </div>
+                </div>
+            </e-content-template>
+        </ejs-dashboardlayout>
     </div>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.syncfusion.com/ej2/29.1.33/dist/ej2.min.js"></script>
-</body>
-</html>
+</div>

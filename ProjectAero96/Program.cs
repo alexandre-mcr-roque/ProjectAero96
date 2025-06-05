@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using ProjectAero96.Data;
 using ProjectAero96.Data.Entities;
+using ProjectAero96.Data.Repositories;
 using ProjectAero96.Helpers;
 
 namespace ProjectAero96
@@ -37,6 +38,7 @@ namespace ProjectAero96
             }).AddDefaultTokenProviders().AddEntityFrameworkStores<DataContext>();
 
             // Repositories
+            builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 
             // Helpers
             builder.Services.AddScoped<IUserHelper, UserHelper>()

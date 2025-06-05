@@ -1,0 +1,73 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Aero96</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.min.css" />
+    <link rel="stylesheet" href="~/css/admin-panel.min.css" />
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/29.1.33/fluent.css" />
+</head>
+<body>
+    <div id="loadingIndicator">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div id="adminPanel" class="visually-hidden">
+        <ejs-sidebar id="dockSidebar" width="220px" type="Push" dockSize="72px" enableGestures="false" enableDock="true" mediaQuery="(min-width: 576px)" animate="false">
+            <e-content-template>
+                <div class="dock">
+                    <ul>
+                        <li class="sidebar-item" id="toggle">
+                            <span class="e-icons expand"></span>
+                            <span class="e-text" title="menu">Menu</span>
+                        </li>
+                        <li class="sidebar-item link-admin">
+                            <span class="e-icons home"></span>
+                            <span class="e-text" title="home">Home</span>
+                        </li>
+                        <li class="sidebar-item link-admin-users">
+                            <span class="e-icons users"></span>
+                            <span class="e-text" title="profile">Users</span>
+                        </li>
+                        <li class="sidebar-item link-admin-airplanes">
+                            <span class="e-icons items"></span>
+                            <span class="e-text" title="items">Airplanes</span>
+                        </li>
+                        <li class="sidebar-item link-admin-cities">
+                            <span class="e-icons location"></span>
+                            <span class="e-text" title="location">Cities</span>
+                        </li>
+                        <li class="sidebar-item link-">
+                            <span class="e-icons exit"></span>
+                            <span class="e-text" title="exit">Exit</span>
+                        </li>
+                    </ul>
+                </div>
+            </e-content-template>
+        </ejs-sidebar>
+        <div>
+            @RenderBody()
+        </div>
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2025 - Aero96 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/js/site.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.1.33/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+    <script src="~/js/admin-panel.js"></script>
+    @await RenderSectionAsync("Scripts", false);
+</body>
+</html>

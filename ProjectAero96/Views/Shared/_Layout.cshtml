@@ -1,12 +1,15 @@
-﻿<!DOCTYPE html>
+﻿@{
+    bool authed = User.Identity!.IsAuthenticated;
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Aero96</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ProjectAero96.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.min.css" />
+    <link rel="stylesheet" href="~/css/main-layout.min.css" />
 </head>
 <body>
     <header>
@@ -27,8 +30,14 @@
                         </li>
                     </ul>
                     <ul class="navbar-nav">
-                        @if (User.Identity!.IsAuthenticated)
+                    @if (authed)
+                    {
+                        @if (User.IsInRole(Roles.Admin.ToString()))
                         {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin Panel</a>
+                                </li>
+                        }
                             <li class="nav-item dropdown">
                                 <a class="nav-link text-dark" role="button" href="#" data-bs-toggle="dropdown" aria-expanded="false">@User.Identity.Name</a>
                                 <ul class="dropdown-menu dropdown-menu-end text-sm-end">
@@ -37,13 +46,13 @@
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="SignOut">Sign Out</a></li>
                                 </ul>
                             </li>
-                        }
-                        else
-                        {
+                    }
+                    else
+                    {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="SignIn">Sign In</a>
                             </li>
-                        }
+                    }
                     </ul>
                 </div>
             </div>
@@ -62,7 +71,7 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/site.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
