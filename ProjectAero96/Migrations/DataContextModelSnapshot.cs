@@ -179,7 +179,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasIndex("AirplaneModelId");
 
-                    b.ToTable("Airplanes");
+                    b.ToTable("Airplanes", (string)null);
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.City", b =>
@@ -203,7 +203,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.Flight", b =>
@@ -242,7 +242,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasIndex("AirplaneId");
 
-                    b.ToTable("Flights");
+                    b.ToTable("Flights", (string)null);
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.FlightStop", b =>
@@ -266,7 +266,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasIndex("CityId");
 
-                    b.ToTable("FlightStops");
+                    b.ToTable("FlightStops", (string)null);
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.ModelAirplane", b =>
@@ -292,7 +292,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AirplaneModels");
+                    b.ToTable("AirplaneModels", (string)null);
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.User", b =>

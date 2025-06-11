@@ -74,12 +74,12 @@ namespace ProjectAero96
             app.Run();
         }
 
-        private static async void RunSeeder(WebApplication app)
+        private static void RunSeeder(WebApplication app)
         {
             using (var scope = app.Services.CreateScope())
             {
                 var seeder = scope.ServiceProvider.GetService<DbSeeder>();
-                await seeder!.SeedAsync();
+                seeder!.SeedAsync().Wait();
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjectAero96.Data.Entities
 {
@@ -16,6 +15,6 @@ namespace ProjectAero96.Data.Entities
         public float? ChildPriceModifier { get; set; }
         public float? BabyPriceModifier { get; set; }
         public Airplane Airplane { get; set; } = null!;
-        public IEnumerable<FlightStop>? FlightStops { get; set; }
+        public ICollection<FlightStop>? FlightStops { get; set; }
     }
 }

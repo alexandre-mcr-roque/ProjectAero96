@@ -1,3 +1,48 @@
-﻿@{
+﻿@model UserViewModel
+@{
     Layout = "_AdminSidebar";
+}
+
+<div class="row">
+    <div class="col col-md-10 offset-md-1">
+        <table id="table" class="display">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.FullName)</th>
+                    <th>@Html.DisplayNameFor(model => model.Roles)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Data</td>
+                    <td>Buttons</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Styles {<link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css" />}
+@section Scripts {
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        console.log($.ajax('/admin/users/get'))
+        $(function () {
+            $('#table').DataTable({
+                ajax: {
+                    url: '/admin/users/get',
+                    dataSrc: 'users'
+                },
+                columns: [
+                    { data: 'fullName' },
+                    { data: 'roles' },
+                    { data: 'id' , render: function (data) {
+                        return `<a href="@Url.Action("EditUser","Admin")?userid=${data}">Test Link</a>`;
+                    }}
+                ]
+            });
+        });
+    </script>
 }

@@ -19,20 +19,20 @@ namespace ProjectAero96.Controllers
             this.mailHelper = mailHelper;
         }
 
-        [Route("signout"), Authorize]
+        [Route("/signout"), Authorize]
         public new async Task<IActionResult> SignOut()
         {
             await userHelper.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
 
-        [Route("signin")]
+        [Route("/signin")]
         public IActionResult SignIn()
         {
             return View();
         }
 
-        [Route("signin")]
+        [Route("/signin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> SignIn([Bind("Email","Password","RememberMe")]SignInViewModel model)
         {
@@ -70,14 +70,14 @@ namespace ProjectAero96.Controllers
         }
 
         // TODO cleanup view
-        [Route("register")]
+        [Route("/register")]
         public IActionResult Register()
         {
             return View();
         }
 
         // TODO add way to resend verification token
-        [Route("register")]
+        [Route("/register")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register([Bind("FirstName","LastName","Email","PhoneNumber","Address1","Address2","City","Country","Password","ConfirmPassword")]RegisterViewModel model)
         {
@@ -127,7 +127,7 @@ namespace ProjectAero96.Controllers
             return View(model);
         }
 
-        [Route("accountverified")]
+        [Route("/accountverified")]
         public async Task<IActionResult> VerifyEmail(string? uid, string? token)
         {
             if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))

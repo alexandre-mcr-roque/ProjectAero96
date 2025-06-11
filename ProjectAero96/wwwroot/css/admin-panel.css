@@ -110,13 +110,13 @@
 
 .e-sidebar .expand::before,
 .e-sidebar.e-right.e-open .expand::before {
-    content: '\e765';
+    content: '\e748';
     font-family: 'e-dock-icons';
 }
 
 .e-sidebar.e-open .expand::before,
 .e-sidebar.e-right .expand::before {
-    content: '\e748';
+    content: '\e765';
     font-family: 'e-dock-icons';
 }
 

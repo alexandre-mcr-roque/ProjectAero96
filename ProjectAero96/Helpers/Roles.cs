@@ -3,6 +3,6 @@
     [Flags]
     public enum Roles
     {
-        Admin = 0b001, Employee = 0b010, Client = 0b100
+        None = 0b000, Admin = 0b001, Employee = 0b010, Client = 0b100
     }
 }

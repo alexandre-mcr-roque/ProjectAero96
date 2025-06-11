@@ -1,30 +1,39 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProjectAero96.Data.Entities;
 
 namespace ProjectAero96.Data
 {
-    public class DataContext : IdentityDbContext<User>
+    public class DataContext(DbContextOptions<DataContext> options) : IdentityDbContext<
+        User, IdentityRole, string,
+        IdentityUserClaim<string>,
+        UserRole,
+        IdentityUserLogin<string>,
+        IdentityRoleClaim<string>,
+        IdentityUserToken<string>>
+        (options)
     {
         public DbSet<City> Cities { get; set; }
         public DbSet<ModelAirplane> AirplaneModels { get; set; }
         public DbSet<Airplane> Airplanes { get; set; }
         public DbSet<Flight> Flights { get; set; }
         public DbSet<FlightStop> FlightStops { get; set; }
-        public DataContext(DbContextOptions<DataContext> options) : base(options)
-        { }
-
-        // Faster than UserManager.Users.Count but less accurate (yet to confirm)
-        public async Task<int> GetUserCountEstimateAsync()
-        {
-            return await Database
-                .SqlQueryRaw<int>("SELECT SUM(row_count) AS rows FROM sys.dm_db_partition_stats WHERE object_id = OBJECT_ID('AspNetUsers') AND index_id < 2;")
-                .FirstAsync();
-        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Explicitly configure UserRole relationships to avoid duplicate columns
+            builder.Entity<UserRole>()
+                .HasOne(ur => ur.User)
+                .WithMany(u => u.Roles)
+                .HasForeignKey(ur => ur.UserId);
+
+            builder.Entity<UserRole>()
+                .HasOne(ur => ur.Role)
+                .WithMany()
+                .HasForeignKey(ur => ur.RoleId);
 
             // Set all FK delete behaviors to restrict
             var fks = builder.Model.GetEntityTypes()

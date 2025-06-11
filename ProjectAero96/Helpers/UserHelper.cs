@@ -8,52 +8,57 @@ namespace ProjectAero96.Helpers
 {
     public class UserHelper : IUserHelper
     {
-        private readonly DataContext dataContext;
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
         private readonly RoleManager<IdentityRole> roleManager;
 
         public UserHelper(
-            DataContext dataContext,
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             RoleManager<IdentityRole> roleManager)
         {
-            this.dataContext = dataContext;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.roleManager = roleManager;
         }
 
-        public Task<int> GetUserCountEstimateAsync() => dataContext.GetUserCountEstimateAsync();
+        public async Task<int> GetUserCountAsync() => await userManager.Users.CountAsync();
 
-        public async Task<IEnumerable<User>> GetUsersAsync()
+        public async Task<ICollection<User>> GetUsersAsync()
         {
             return await userManager.Users.AsNoTracking().ToListAsync();
         }
 
-        // TODO test
-        public async Task<IEnumerable<User>> GetUsersAsync(int pageIndex, int pageSize)
+        public async Task<ICollection<User>> GetUsersWithRoleAsync()
         {
-            var users = userManager.Users.AsNoTracking();
-            if (pageIndex > 1)
-            {
-                users = users.Skip(pageIndex * pageSize);
-            }
-            if (pageSize > 0)
-            {
-                users = users.Take(pageSize);
-            }
-            return await users.ToListAsync();
+            return await userManager.Users
+                .AsNoTracking()
+                .Include(u => u.Roles)
+                .ThenInclude(ur => ur.Role)
+                .ToListAsync();
         }
 
-        public async Task<User?> FindUserByIdAsync(string userId)
+        public async Task<User?> FindUserByIdAsync(string userId, bool includeRole = false)
         {
+            if (includeRole)
+            {
+                return await userManager.Users
+                    .Include(u => u.Roles)
+                    .ThenInclude(ur => ur.Role)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+            }
             return await userManager.FindByIdAsync(userId);
         }
 
-        public async Task<User?> FindUserByEmailAsync(string email)
+        public async Task<User?> FindUserByEmailAsync(string email, bool includeRole = false)
         {
+            if (includeRole)
+            {
+                return await userManager.Users
+                    .Include(u => u.Roles)
+                    .ThenInclude(ur => ur.Role)
+                    .FirstOrDefaultAsync(u => u.UserName == email); // UserName == Email
+            }
             return await userManager.FindByNameAsync(email);    // UserName == Email
         }
 

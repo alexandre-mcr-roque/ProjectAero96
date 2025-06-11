@@ -11,7 +11,7 @@ namespace ProjectAero96.Data.Repositories
         {
             this.dataContext = dataContext;
         }
-        public async Task<IEnumerable<City>> GetCitiesAsync()
+        public async Task<ICollection<City>> GetCitiesAsync()
         {
             return await dataContext.Cities.AsNoTracking().ToListAsync();
         }
@@ -19,8 +19,7 @@ namespace ProjectAero96.Data.Repositories
         public async Task<City?> GetCityAsync(int id)
         {
             return await dataContext.Cities.AsNoTracking()
-                .Where(c => c.Id == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<bool> AddCityAsync(City city)
@@ -41,7 +40,7 @@ namespace ProjectAero96.Data.Repositories
             return await dataContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<IEnumerable<ModelAirplane>> GetAirplaneModelsAsync()
+        public async Task<ICollection<ModelAirplane>> GetAirplaneModelsAsync()
         {
             return await dataContext.AirplaneModels.AsNoTracking().ToListAsync();
         }
@@ -49,8 +48,7 @@ namespace ProjectAero96.Data.Repositories
         public async Task<ModelAirplane?> GetAirplaneModelAsync(int id)
         {
             return await dataContext.AirplaneModels.AsNoTracking()
-                .Where(am => am.Id == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(am => am.Id == id);
         }
 
         public async Task<bool> AddAirplaneModelAsync(ModelAirplane modelAirplane)

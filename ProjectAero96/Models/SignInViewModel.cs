@@ -6,6 +6,7 @@ namespace ProjectAero96.Models
     {
         [Required]
         [DataType(DataType.EmailAddress)]
+        [Display(Name = "Email Address")]
         public string Email { get; set; } = null!;
 
         [Required]

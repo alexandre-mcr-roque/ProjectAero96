@@ -1,9 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using ProjectAero96.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProjectAero96.Models
 {
-    public class RegisterViewModel
+    public class UserViewModel
     {
+        public string Id { get; set; } = null!;
+
         [Required]
         [Display(Name = "First Name")]
         [MaxLength(100, ErrorMessage = "This field must have {0} characters or less.")]
@@ -13,6 +17,9 @@ namespace ProjectAero96.Models
         [Display(Name = "Last Name")]
         [MaxLength(100, ErrorMessage = "This field must have {0} characters or less.")]
         public string LastName { get; set; } = null!;
+
+        [Display(Name = "Full Name")]
+        public string FullName => $"{FirstName} {LastName}";
 
         [Required]
         [DataType(DataType.EmailAddress)]
@@ -41,12 +48,9 @@ namespace ProjectAero96.Models
         public string Country { get; set; } = null!;
 
         [Required]
-        [DataType(DataType.Password)]
-        public string Password { get; set; } = null!;
+        [MinLength(1, ErrorMessage = "User must have at least 1 role.")]
+        public string Roles { get; set; } = null!;
 
-        [Required]
-        [Display(Name = "Confirm Password")]
-        [DataType(DataType.Password)]
-        public string ConfirmPassword { get; set; } = null!;
+        public bool Deleted { get; set; }
     }
 }
