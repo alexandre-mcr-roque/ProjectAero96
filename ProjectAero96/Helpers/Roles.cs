@@ -3,6 +3,7 @@
     [Flags]
     public enum Roles
     {
-        None = 0b000, Admin = 0b001, Employee = 0b010, Client = 0b100
+        // If adding new roles, also add them in wwwroot/js/users-dataTable.js
+        None = 0b000, Client = 0b001, Employee = 0b010, Admin = 0b100
     }
 }

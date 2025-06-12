@@ -190,3 +190,15 @@
     font-style: normal;
 }
 /* end of sidebar styles */
+
+/* Users dataTable role select box */
+#role-select {
+    display: inline-block;
+    width: auto;
+    margin-left: .5em;
+}
+@media screen and (max-width: 767px) {
+    #role-selectbox {
+        text-align: center;
+    }
+}

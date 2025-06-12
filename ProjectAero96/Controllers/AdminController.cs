@@ -56,7 +56,7 @@ namespace ProjectAero96.Controllers
         [Route("/admin/users/get")]
         public async Task<JsonResult> GetUsers()
         {
-            var users = await userHelper.GetUsersAsync();
+            var users = await userHelper.GetUsersWithRoleAsync();
             return Json(new { users = users.ToViewModels(userHelper) });
         }
     }

@@ -1,0 +1,60 @@
+﻿$(function () {
+    $('#table-users').DataTable({
+        layout: {
+            topEnd: [
+                {
+                    div: {
+                        id: 'role-selectbox'
+                    }
+                },
+                {
+                    search: {
+                        text: 'Search user: _INPUT_'
+                    }
+                }
+            ]
+        },
+        ajax: {
+            url: '/admin/users/get',
+            dataSrc: 'users'
+        },
+        columnDefs: [
+            { className: 'align-middle', targets: '_all' }
+        ],
+        columns: [
+            { data: 'fullName' },
+            { data: 'email' },
+            { data: 'roles', orderable: false },
+            {
+                orderable: false,
+                searchable: false,
+                width: '8em',
+                data: 'id',
+                render: function (data) {
+                    return '<div class="text-center">'
+                        + `<a class="btn btn-sm btn-primary m-1" href="@Url.Action("EditUser", "Admin")?userid=${data}" role="button"><i class="fa-solid fa-user-pen"></i></a>`
+                        + `<a class="btn btn-sm btn-danger m-1" href="@Url.Action("EditUser", "Admin")?userid=${data}" role="button"><i class="fa-solid fa-user-xmark"></i></a>`
+                        + '</div>';
+                }
+            }
+        ]
+    });
+    $('#role-selectbox')
+        .append('<label for="role-select">Filter by role:</label>')
+        .append($('<select></select>', {
+            'id': 'role-select',
+            'class': 'form-select form-select-sm',
+            // Add roles here
+            html: '<option value="" selected>None</option>'
+                + '<option value="Client">Client</option>'
+                + '<option value="Employee">Employee</option>'
+                + '<option value="Admin">Admin</option>',
+            on: {
+                change: function () {
+                    $('#table-users').DataTable().column(2)
+                        .search($(this).val())
+                        .draw();
+                }
+            }
+        }));
+});
