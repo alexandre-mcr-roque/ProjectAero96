@@ -191,14 +191,19 @@
 }
 /* end of sidebar styles */
 
-/* Users dataTable role select box */
+/* Users dataTable */
 #role-select {
     display: inline-block;
     width: auto;
     margin-left: .5em;
 }
+.row-disabled {
+    background-color: #343a40 !important; /* Bootstrap dark */
+    color: #fff !important;
+    opacity: 0.85;
+}
 @media screen and (max-width: 767px) {
-    #role-selectbox {
+    .dataTable-feature {
         text-align: center;
     }
 }

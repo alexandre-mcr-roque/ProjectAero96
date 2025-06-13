@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using ProjectAero96.Data;
 using ProjectAero96.Data.Entities;
-using Syncfusion.EJ2.Linq;
 
 namespace ProjectAero96.Helpers
 {
@@ -107,5 +105,19 @@ namespace ProjectAero96.Helpers
             if (await IsUserInRoleAsync(user, role)) return IdentityResult.Success;
             return await userManager.AddToRoleAsync(user, role.ToString());
         }
+
+        public async Task<IdentityResult> SetUserDeleted(User user, bool deleted = true)
+        {
+            user.Deleted = deleted;
+            return await userManager.UpdateAsync(user);
+        }
+
+        //==========================================================
+        // Passthrough methods
+        //==========================================================
+        /// <inheritdoc cref="UserManager{TUser}.NormalizeEmail(string?)"/>
+        public string? NormalizeEmail(string? email) => userManager.NormalizeEmail(email);
+        /// <inheritdoc cref="UserManager{TUser}.NormalizeName(string?)"/>
+        public string? NormalizeName(string? name) => userManager.NormalizeName(name);
     }
 }

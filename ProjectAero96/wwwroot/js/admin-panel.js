@@ -11,7 +11,7 @@
             let path = this.className.split(' ').find(s => s.startsWith('link')).split('-');
             let pathname = '';
             for (let i = 1; i < path.length; i++) { pathname += `/${path[i]}`; }
-            if (window.location.pathname.startsWith(pathname)) return false;
+            if (window.location.pathname === pathname) return false;
             window.location.pathname = pathname;
         });
     });

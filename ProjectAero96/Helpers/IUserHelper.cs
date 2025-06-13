@@ -18,5 +18,14 @@ namespace ProjectAero96.Helpers
         Task CreateRoleAsync(Roles role);
         Task<bool> IsUserInRoleAsync(User user, Roles role);
         Task<IdentityResult> AddUserToRoleAsync(User user, Roles role);
+        Task<IdentityResult> SetUserDeleted(User user, bool deleted = true);
+
+        //==========================================================
+        // Passthrough methods
+        //==========================================================
+        /// <inheritdoc cref="UserManager{TUser}.NormalizeEmail(string?)"/>
+        string? NormalizeEmail(string? email);
+        /// <inheritdoc cref="UserManager{TUser}.NormalizeName(string?)"/>
+        string? NormalizeName(string? name);
     }
 }

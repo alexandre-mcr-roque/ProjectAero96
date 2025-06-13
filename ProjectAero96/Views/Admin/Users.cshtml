@@ -19,6 +19,29 @@
         </table>
     </div>
 </div>
+@section Modals {
+    <div class="modal fade" id="disable-modal" tabindex="-1" aria-labelledby="disable-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="disable-modal-label">Disable user?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="disable-userid"/>
+                    <p>
+                        Are you sure you want to disable this user?
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="confirm-disable">Disable User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @section Styles {
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css" />
@@ -28,5 +51,5 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.min.js"></script>
     <script src="~/lib/font-awesome/js/all.min.js"></script>
-    <script src="~/js/users-dataTable.min.js"></script>
+    <script src="~/js/users-dataTable.js"></script>
 }

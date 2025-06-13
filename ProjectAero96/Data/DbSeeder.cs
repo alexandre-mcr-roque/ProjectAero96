@@ -94,6 +94,9 @@ namespace ProjectAero96.Data
                     Address1 = "(Address)",
                     City = "(City)",
                     Country = "(Country)",
+                    // due to manually adding user to DbSet, it is required to set the normalized values
+                    NormalizedUserName = userHelper.NormalizeName(email),
+                    NormalizedEmail = userHelper.NormalizeEmail(email)
                 };
                 user.PasswordHash = hasher.HashPassword(user, testPassword);
                 user.Roles = [new UserRole { User = user, Role = iRole }];

@@ -23,10 +23,10 @@ body {
 
 .footer {
     position: absolute;
-    color: #fff;
+    background-color: #ffffff;
     bottom: 0;
     width: 100%;
     white-space: nowrap;
     line-height: 60px;
-    z-index: 2000;
+    z-index: 1010;
 }

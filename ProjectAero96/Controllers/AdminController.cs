@@ -43,8 +43,8 @@ namespace ProjectAero96.Controllers
             return View();
         }
 
-        [Route("/admin/users/edit")]
-        public async Task<IActionResult> EditUser(string? userid)
+        [Route("/admin/users/edit/{userid}")]
+        public async Task<IActionResult> EditUser(string userid)
         {
             if (string.IsNullOrEmpty(userid)) return NotFound();
             var model = await userHelper.FindUserByIdAsync(userid, true)
@@ -53,11 +53,32 @@ namespace ProjectAero96.Controllers
             return View(model);
         }
 
-        [Route("/admin/users/get")]
+        [Route("/admin/users/getall")]
         public async Task<JsonResult> GetUsers()
         {
             var users = await userHelper.GetUsersWithRoleAsync();
             return Json(new { users = users.ToViewModels(userHelper) });
+        }
+
+        [Route("/admin/users/disable/{userid}")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DisableUser(string userid)
+        {
+            var user = await userHelper.FindUserByIdAsync(userid);
+            if (user == null || user.Deleted)
+            {
+                return NotFound("User is already disabled");
+            }
+            if (user.UserName == User.Identity!.Name)
+            {
+                return Unauthorized("Unable to disable itself");
+            }
+            var result = await userHelper.SetUserDeleted(user);
+            if (!result.Succeeded)
+            {
+                return NotFound("Unknown error");
+            }
+            return Ok(user);
         }
     }
 }

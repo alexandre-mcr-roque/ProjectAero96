@@ -5,6 +5,7 @@ using ProjectAero96.Data;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Data.Repositories;
 using ProjectAero96.Helpers;
+using ProjectAero96.Middleware;
 
 namespace ProjectAero96
 {
@@ -64,6 +65,8 @@ namespace ProjectAero96
             app.UseRouting();
 
             app.UseAuthentication();
+            // must be ran after populating HttpContext.User and before checking if they're have authorization for the action
+            app.UseMiddleware<CheckUserDeletedMiddleware>();
             app.UseAuthorization();
 
             app.MapControllerRoute(

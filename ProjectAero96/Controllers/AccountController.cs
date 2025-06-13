@@ -44,9 +44,9 @@ namespace ProjectAero96.Controllers
             }
 
             var user = await userHelper.FindUserByEmailAsync(model.Email);
-            if (user == null)
+            if (user == null || user.Deleted)
             {
-                ViewBag.Summary = FormSummary.Danger("Invalid credentials.");
+                ViewBag.Summary = FormSummary.Danger("There is no account registered with the email provided.");
                 model.Password = string.Empty;
                 return View(model);
             }

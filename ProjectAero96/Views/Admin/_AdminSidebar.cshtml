@@ -56,19 +56,21 @@
         <div>
             @RenderBody()
         </div>
-        <footer class="border-top footer text-muted">
-            <div class="container">
-                &copy; 2025 - Aero96 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-            </div>
-        </footer>
     </div>
 
-    <script src="~/js/site.js"></script>
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - Aero96 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Modals", false);
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.syncfusion.com/ej2/29.1.33/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
-    <script src="~/js/admin-panel.js"></script>
+    <script src="~/js/site.min.js"></script>
+    <script src="~/js/admin-panel.min.js"></script>
     @await RenderSectionAsync("Scripts", false);
 </body>
 </html>
