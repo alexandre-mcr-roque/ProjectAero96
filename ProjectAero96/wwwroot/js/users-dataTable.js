@@ -9,6 +9,16 @@
 
     var table = $('#table-users').DataTable({
         layout: {
+            topStart: [
+                'pageLength',
+                {
+                    div: {
+                        className: 'dataTable-feature',
+                        id: 'create-user-container',
+                        html: '<a href="/admin/users/create" class="btn btn-sm btn-primary" role="button">Create new User</a>'
+                    }
+                }
+            ],
             topEnd: [
                 {
                     div: {
@@ -48,10 +58,16 @@
                 searchable: false,
                 width: '8em',
                 data: 'id',
-                render: function (data) {
+                render: function (uid, _, user) {
+                    if (user.deleted) {
+                        return '<div class="text-center">'
+                                + `<a class="btn btn-sm btn-primary m-1" href="/admin/users/edit/${uid}" role="button"><i class="fa-solid fa-user-pen"></i></a>`
+                                + `<button class="btn btn-sm btn-success m-1" id="restore-modal-toggle" restore-target="${uid}"><i class="fa-solid fa-user-plus"></i></button>`
+                             + '</div>';
+                    }
                     return '<div class="text-center">'
-                            + `<a class="btn btn-sm btn-primary m-1" href="/admin/users/edit/${data}" role="button"><i class="fa-solid fa-user-pen"></i></a>`
-                            + `<button class="btn btn-sm btn-danger m-1" id="disable-modal-toggle" delete-target="${data}"><i class="fa-solid fa-user-xmark"></i></button>`
+                            + `<a class="btn btn-sm btn-primary m-1" href="/admin/users/edit/${uid}" role="button"><i class="fa-solid fa-user-pen"></i></a>`
+                            + `<button class="btn btn-sm btn-danger m-1" id="disable-modal-toggle" disable-target="${uid}"><i class="fa-solid fa-user-xmark"></i></button>`
                          + '</div>';
                 }
             }
@@ -63,11 +79,11 @@
         }
     });
     table.processing(false);
-
+    // Show disabled users checkbox
     $('#show-disabled').on('change', function () {
         table.ajax.reload();
     });
-
+    // Role select box
     $('#role-selectbox')
         .append('<label for="role-select">Filter by role:</label>')
         .append($('<select></select>', {
@@ -85,17 +101,18 @@
                 }
             }
         }));
+    // Disable modal
     $('#table-users').on('click', 'button[id="disable-modal-toggle"]', function () {
-        const userId = $(this).attr('delete-target');
-        $('#disable-userid').val(userId);
+        const uid = $(this).attr('disable-target');
+        $('#disable-userid').val(uid);
         $('#disable-modal').modal('show');
     });
     $('#confirm-disable').on('click', function () {
-        const userId = $('#disable-userid').val();
+        const uid = $('#disable-userid').val();
         // Get the anti-forgery token value from the hidden input
         const token = $('input[name="__RequestVerificationToken"]').val();
         $.ajax({
-            url: `/admin/users/disable/${userId}`,
+            url: `/admin/users/disable/${uid}`,
             type: 'POST',
             headers: {
                 'RequestVerificationToken': token // Add the token to the request headers
@@ -108,6 +125,33 @@
             },
             complete: function () {
                 $('#disable-modal').modal('hide');
+            },
+        });
+    });
+    // Restore modal
+    $('#table-users').on('click', 'button[id="restore-modal-toggle"]', function () {
+        const uid = $(this).attr('restore-target');
+        $('#restore-userid').val(uid);
+        $('#restore-modal').modal('show');
+    });
+    $('#confirm-restore').on('click', function () {
+        const uid = $('#restore-userid').val();
+        // Get the anti-forgery token value from the hidden input
+        const token = $('input[name="__RequestVerificationToken"]').val();
+        $.ajax({
+            url: `/admin/users/restore/${uid}`,
+            type: 'POST',
+            headers: {
+                'RequestVerificationToken': token // Add the token to the request headers
+            },
+            success: function () {
+                table.ajax.reload();
+            },
+            error: function (xhr) {
+                alert(`Error disabling user: ${xhr.responseText}`);
+            },
+            complete: function () {
+                $('#restore-modal').modal('hide');
             },
         });
     });

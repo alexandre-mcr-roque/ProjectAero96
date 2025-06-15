@@ -13,11 +13,13 @@
         {
             if (context.User.Identity?.IsAuthenticated == true)
             {
-                var userId = userManager.GetUserId(context.User);
-                if (!string.IsNullOrEmpty(userId))
+                var uid = userManager.GetUserId(context.User);
+                if (!string.IsNullOrEmpty(uid))
                 {
-                    var user = await userManager.FindByIdAsync(userId);
-                    if (user == null || user.Deleted) // user no longer exists or is marked as deleted
+                    var user = await userManager.FindByIdAsync(uid);
+                    // Invalid user (deleted/disabled or requires password change)
+                    // TODO Remove RequiresPasswordChange and EmailConfirmed checks if I don't add a way for admins to modify them
+                    if (user == null || user.Deleted || user.RequiresPasswordChange || !user.EmailConfirmed)
                     {
                         await signInManager.SignOutAsync();
                         context.Response.Redirect("/signin");

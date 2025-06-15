@@ -60,6 +60,11 @@ namespace ProjectAero96.Helpers
             return await userManager.FindByNameAsync(email);    // UserName == Email
         }
 
+        public async Task<IdentityResult> AddUserAsync(User user)
+        {
+            user.RequiresPasswordChange = true; // Set RequiresPasswordChange to true by default
+            return await userManager.CreateAsync(user);
+        }
         public async Task<IdentityResult> AddUserAsync(User user, string password)
         {
             return await userManager.CreateAsync(user, password);
@@ -73,6 +78,16 @@ namespace ProjectAero96.Helpers
         public async Task<IdentityResult> VerifyEmailAsync(User user, string token)
         {
             return await userManager.ConfirmEmailAsync(user, token);
+        }
+
+        public async Task<string> GenerateChangePasswordTokenAsync(User user)
+        {
+            return await userManager.GeneratePasswordResetTokenAsync(user);
+        }
+
+        public async Task<IdentityResult> ChangePasswordAsync(User user, string token, string newPassword)
+        {
+            return await userManager.ResetPasswordAsync(user, token, newPassword);
         }
 
         public async Task<SignInResult> SignInAsync(User user, string password, bool isPersistent)
@@ -110,6 +125,21 @@ namespace ProjectAero96.Helpers
         {
             user.Deleted = deleted;
             return await userManager.UpdateAsync(user);
+        }
+
+        public async Task<IEnumerable<IdentityRole>> GetRolesAsync(Roles roles)
+        {
+            var result = new List<IdentityRole>();
+            foreach (var role in Enum.GetValues<Roles>())
+            {
+                if (roles.HasFlag(role) && role != Roles.None)
+                {
+                    var userRole = await roleManager.FindByNameAsync(role.ToString());
+                    if (userRole != null)
+                        result.Add(userRole);
+                }
+            }
+            return result;
         }
 
         //==========================================================

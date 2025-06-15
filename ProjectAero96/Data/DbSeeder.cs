@@ -51,7 +51,7 @@ namespace ProjectAero96.Data
                     City = "(City)",
                     Country = "(Country)"
                 };
-                user.Roles = [new UserRole { User = user, Role = adminRole }];
+                user.Roles = adminRole.ToUserRoles(user);
                 result = await userHelper.AddUserAsync(user, adminPassword);
                 if (!result.Succeeded) throw new Exception(result.Errors.First().Description);
 #if DEBUG

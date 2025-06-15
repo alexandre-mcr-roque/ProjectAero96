@@ -11,6 +11,7 @@ namespace ProjectAero96.Data.Entities
         public string City { get; set; } = null!;
         public string Country { get; set; } = null!;
         public ICollection<UserRole> Roles { get; set; } = [];
+        public bool RequiresPasswordChange { get; set; } = false;
         public bool Deleted { get; set; }
     }
 }

@@ -51,6 +51,12 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
+            if (user.RequiresPasswordChange)             {
+                ViewBag.Summary = FormSummary.Danger("You must change your password before signing in.");
+                model.Password = string.Empty;
+                return View(model);
+            }
+
             var result = await userHelper.SignInAsync(user, model.Password, model.RememberMe);
             if (!result.Succeeded)
             {
@@ -98,18 +104,7 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            user = new User
-            {
-                UserName = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
-                Address1 = model.Address1,
-                Address2 = model.Address2,
-                City = model.City,
-                Country = model.Country
-            };
+            user = model.ToEntity();
             var result = await userHelper.AddUserAsync(user, model.Password);
             if (!result.Succeeded)
             {
@@ -150,7 +145,7 @@ namespace ProjectAero96.Controllers
             return View();
         }
 
-        private async Task SendVerificationEmail(User user)
+        public async Task SendVerificationEmail(User user)
         {
             var tokenLink = Url.Action("VerifyEmail", "Account", new
             {
@@ -166,6 +161,74 @@ namespace ProjectAero96.Controllers
                 </p>
                 """;
             await mailHelper.SendEmailAsync(user.Email!, "Email Verification", body);
+        }
+
+        [Route("/account/changepassword")]
+        public async Task<IActionResult> ChangePassword(string? uid, string? token)
+        {
+            if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
+            {
+                return NotFound();
+            }
+
+            var user = await userHelper.FindUserByIdAsync(uid);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await userHelper.VerifyEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                return NotFound();
+            }
+
+            return View();
+        }
+
+        [Route("/account/changepassword")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(string? uid, string? token,
+            [Bind("Password","ConfirmPassword")]ChangePasswordModel model)
+        {
+            if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
+            {
+                return NotFound();
+            }
+
+            var user = await userHelper.FindUserByIdAsync(uid);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                model.Password = string.Empty;
+                model.ConfirmPassword = string.Empty;
+                return View(model);
+            }
+
+            return View();
+        }
+
+        public async Task SendPasswordChangeEmail(User user)
+        {
+            var tokenLink = Url.Action("ChangePassword", "Account", new
+            {
+                uid = user.Id,
+                token = await userHelper.GenerateChangePasswordTokenAsync(user)
+            }, protocol: HttpContext.Request.Scheme);
+            string body = $"""
+                <span style="font-size:2em">Change Password</span>
+                <p>
+                    To change your account's password, please click on the following link.
+                    <br><br>
+                    <a style="background-color:#0d6efd;padding:.375em .75em;border-radius:.25em;color:#fff;text-decoration:none;border:1px solid #0d6efd" href="{tokenLink}">Change Password</a>
+                </p>
+                """;
+            await mailHelper.SendEmailAsync(user.Email!, "Password Change", body);
         }
     }
 }
