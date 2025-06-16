@@ -70,6 +70,17 @@ namespace ProjectAero96.Helpers
             return await userManager.CreateAsync(user, password);
         }
 
+        public async Task<IdentityResult> UpdateUserAsync(User user)
+        {
+            return await userManager.UpdateAsync(user);
+        }
+
+        public async Task<IdentityResult> SetUserDeleted(User user, bool deleted = true)
+        {
+            user.Deleted = deleted;
+            return await userManager.UpdateAsync(user);
+        }
+
         public async Task<string> GenerateVerifyEmailTokenAsync(User user)
         {
             return await userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -119,12 +130,6 @@ namespace ProjectAero96.Helpers
         {
             if (await IsUserInRoleAsync(user, role)) return IdentityResult.Success;
             return await userManager.AddToRoleAsync(user, role.ToString());
-        }
-
-        public async Task<IdentityResult> SetUserDeleted(User user, bool deleted = true)
-        {
-            user.Deleted = deleted;
-            return await userManager.UpdateAsync(user);
         }
 
         public async Task<IEnumerable<IdentityRole>> GetRolesAsync(Roles roles)

@@ -3,12 +3,12 @@
     Layout = "_AdminSidebar";
 }
 
-<h2 class="text-center">Register</h2>
-<div id="row">
-    <div id="col col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+<h2 class="text-center">Create New User</h2>
+<div class="row m-1">
+    <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3">
         <partial name="_FormSummary" />
         <hr />
-        <form>
+        <form asp-action="CreateUser">
             <div class="form-group mb-3">
                 <label asp-for="FirstName" class="form-label"></label>
                 <input asp-for="FirstName" class="form-control" />
@@ -49,9 +49,56 @@
                 <input asp-for="Country" class="form-control" />
                 <span asp-validation-for="Country" class="text-danger"></span>
             </div>
+            <div class="form-group mb-3">
+                <label asp-for="Roles" class="form-label"></label>
+                <div class="form-check ps-5">
+                    <input asp-for="IsAdmin" class="form-check-input" type="checkbox" />
+                    <label asp-for="IsAdmin" class="form-check-label"></label>
+                </div>
+                <div class="form-check ps-5">
+                    <input asp-for="IsEmployee" class="form-check-input" type="checkbox" />
+                    <label asp-for="IsEmployee" class="form-check-label"></label>
+                </div>
+                <div class="form-check ps-5">
+                    <input asp-for="IsClient" class="form-check-input" type="checkbox" />
+                    <label asp-for="IsClient" class="form-check-label"></label>
+                </div>
+                <span asp-validation-for="HasRole" class="text-danger"></span>
+            </div>
             <div class="form-group text-center">
-                <input type="submit" value="Create User" class="btn btn-primary" />
+                <button type="button" class="btn btn-primary" id="open-modal">Create User</button>
+                <a asp-action="Users" role="button" class="btn btn-secondary">Return</a>
             </div>
         </form>
     </div>
 </div>
+
+@section Modals {
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-label">Create User?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Are you sure you want to create this user?<br />
+                        <span id="modal-user-email"></span>
+                    </p>
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Warning:</strong> Be careful when setting users with Admin or Employee roles, as they will have elevated permissions.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="submit-form" type="button" class="btn btn-primary">Create User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/user-crud.min.js"></script>
+}

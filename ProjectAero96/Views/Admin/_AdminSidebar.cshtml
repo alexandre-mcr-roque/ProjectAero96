@@ -64,13 +64,13 @@
         </div>
     </footer>
 
-    @await RenderSectionAsync("Modals", false);
+    @await RenderSectionAsync("Modals", required: false);
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.syncfusion.com/ej2/29.1.33/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
     <script src="~/js/site.min.js"></script>
     <script src="~/js/admin-panel.min.js"></script>
-    @await RenderSectionAsync("Scripts", false);
+    @await RenderSectionAsync("Scripts", required: false);
 </body>
 </html>

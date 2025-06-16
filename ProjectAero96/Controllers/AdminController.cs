@@ -1,11 +1,8 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Data.Repositories;
 using ProjectAero96.Helpers;
 using ProjectAero96.Models;
-using Syncfusion.EJ2.Base;
 
 namespace ProjectAero96.Controllers
 {
@@ -64,14 +61,7 @@ namespace ProjectAero96.Controllers
                 ViewBag.Summary = FormSummary.Danger("There is already a registered account with the given email.");
                 return View(model);
             }
-            user = model.ToEntity();
-            Roles roles;
-            if (!Enum.TryParse(model.Roles, out roles))
-            {
-                ViewBag.Summary = FormSummary.Danger("Invalid roles specified. Please select valid roles.");
-                return View(model);
-            }
-            user.Roles = await userHelper.GetRolesAsync(roles).ToUserRoles(user);
+            user = await model.ToNewEntityAsync(userHelper);
             // Automatically confirm email for admin-created users
             // (they still need to change the password before signing in, thus indirectly confirming their email)
             user.EmailConfirmed = true;
@@ -92,8 +82,59 @@ namespace ProjectAero96.Controllers
         {
             if (string.IsNullOrEmpty(uid)) return NotFound();
             var model = await userHelper.FindUserByIdAsync(uid, true)
-                                        .ToViewModelAsync(userHelper);
+                                        .ToViewModelAsync();
             if (model == null) return NotFound();
+            return View(model);
+        }
+
+        [Route("/admin/users/edit/{uid}")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditUser(string uid, [Bind("FirstName", "LastName", "Email", "PhoneNumber", "Address1", "Address2", "City", "Country", "Roles")] UserViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                return View(model);
+            }
+            var user = await userHelper.FindUserByEmailAsync(model.Email);
+            if (user == null || user.Id != uid)
+            {
+                return RedirectToAction("Users");
+            }
+            
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Email = model.Email;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Address1 = model.Address1;
+            user.Address2 = model.Address2;
+            user.City = model.City;
+            user.Country = model.Country;
+
+            user.Roles.Clear();
+            if (model.IsAdmin)
+            {
+                var role = await userHelper.GetRolesAsync(Roles.Admin);
+                user.Roles.Add(new UserRole { User = user, Role = role.First() });
+            }
+            if (model.IsEmployee)
+            {
+                var role = await userHelper.GetRolesAsync(Roles.Employee);
+                user.Roles.Add(new UserRole { User = user, Role = role.First() });
+            }
+            if (model.IsClient)
+            {
+                var role = await userHelper.GetRolesAsync(Roles.Client);
+                user.Roles.Add(new UserRole { User = user, Role = role.First() });
+            }
+            var result = await userHelper.UpdateUserAsync(user);
+            if (!result.Succeeded)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened. Please try again later.");
+                return View(model);
+            }
+
+            ViewBag.Summary = FormSummary.Success("User edited successfully.");
             return View(model);
         }
 
@@ -101,7 +142,7 @@ namespace ProjectAero96.Controllers
         public async Task<JsonResult> GetUsers()
         {
             var users = await userHelper.GetUsersWithRoleAsync();
-            return Json(new { users = users.ToViewModels(userHelper) });
+            return Json(new { users = users.ToViewModels() });
         }
 
         [Route("/admin/users/disable/{uid}")]

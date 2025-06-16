@@ -3,4 +3,97 @@
     Layout = "_AdminSidebar";
 }
 
-<p>@Model.FullName</p>
+<h2 class="text-center">Edit User</h2>
+<div class="row m-1">
+    <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+        <partial name="_FormSummary" />
+        <hr />
+        <form asp-action="EditUser">
+            <div class="form-group mb-3">
+                <label asp-for="FirstName" class="form-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="LastName" class="form-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="PhoneNumber" class="form-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Address1" class="form-label"></label>
+                <input asp-for="Address1" class="form-control" />
+                <span asp-validation-for="Address1" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Address2" class="form-label"></label>
+                <input asp-for="Address2" class="form-control" />
+                <span asp-validation-for="Address2" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="City" class="form-label"></label>
+                <input asp-for="City" class="form-control" />
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Country" class="form-label"></label>
+                <input asp-for="Country" class="form-control" />
+                <span asp-validation-for="Country" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Roles" class="form-label"></label>
+                <div class="form-check ps-5">
+                    <input asp-for="IsAdmin" class="form-check-input" type="checkbox" />
+                    <label asp-for="IsAdmin" class="form-check-label"></label>
+                </div>
+                <div class="form-check ps-5">
+                    <input asp-for="IsEmployee" class="form-check-input" type="checkbox" />
+                    <label asp-for="IsEmployee" class="form-check-label"></label>
+                </div>
+                <div class="form-check ps-5">
+                    <input asp-for="IsClient" class="form-check-input" type="checkbox" />
+                    <label asp-for="IsClient" class="form-check-label"></label>
+                </div>
+                <span asp-validation-for="HasRole" class="text-danger"></span>
+            </div>
+            <div class="form-group text-center">
+                <button type="button" class="btn btn-primary" id="open-modal">Save Values</button>
+                <a asp-action="Users" role="button" class="btn btn-secondary">Return</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Modals {
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-label">Save Values?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Are you sure you want to change the values of this user?<br />
+                        <span>Email: @Html.DisplayFor(model => model.Email)</span>
+                    </p>
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Warning:</strong> Be careful when setting users with Admin or Employee roles, as they will have elevated permissions.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="submit-form" type="button" class="btn btn-primary">Save Values</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/user-crud.min.js"></script>
+}

@@ -1,0 +1,10 @@
+﻿[
+  {
+    "outputFile": "wwwroot/js/create-user.es5.js",
+    "inputFile": "wwwroot/js/create-user.js"
+  },
+  {
+    "outputFile": "wwwroot/js/create-user.min.es5.js",
+    "inputFile": "wwwroot/js/create-user.min.js"
+  }
+]

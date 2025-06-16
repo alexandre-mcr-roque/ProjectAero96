@@ -12,6 +12,8 @@ namespace ProjectAero96.Helpers
         Task<User?> FindUserByEmailAsync(string email, bool includeRole = false);
         Task<IdentityResult> AddUserAsync(User user);
         Task<IdentityResult> AddUserAsync(User user, string password);
+        Task<IdentityResult> UpdateUserAsync(User user);
+        Task<IdentityResult> SetUserDeleted(User user, bool deleted = true);
         Task<string> GenerateVerifyEmailTokenAsync(User user);
         Task<IdentityResult> VerifyEmailAsync(User user, string token);
         Task<string> GenerateChangePasswordTokenAsync(User user);
@@ -21,7 +23,6 @@ namespace ProjectAero96.Helpers
         Task CreateRoleAsync(Roles role);
         Task<bool> IsUserInRoleAsync(User user, Roles role);
         Task<IdentityResult> AddUserToRoleAsync(User user, Roles role);
-        Task<IdentityResult> SetUserDeleted(User user, bool deleted = true);
         Task<IEnumerable<IdentityRole>> GetRolesAsync(Roles roles);
 
         //==========================================================

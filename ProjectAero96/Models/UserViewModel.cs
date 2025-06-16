@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using ProjectAero96.Helpers;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ProjectAero96.Models
 {
@@ -47,10 +45,20 @@ namespace ProjectAero96.Models
         [MaxLength(50, ErrorMessage = "This field must have {0} characters or less.")]
         public string Country { get; set; } = null!;
 
-        [Required]
-        [MinLength(1, ErrorMessage = "User must have at least 1 role.")]
-        public string Roles { get; set; } = null!;
-
+        public string? Roles { get; set; } = null!;
         public bool Deleted { get; set; }
+
+        ///<summary>Used in CreateUser</summary>
+        [Display(Name = "Admin")]
+        public bool IsAdmin { get; set; }
+        ///<summary>Used in CreateUser</summary>
+        [Display(Name = "Employee")]
+        public bool IsEmployee { get; set; }
+        ///<summary>Used in CreateUser</summary>
+        [Display(Name = "Client")]
+        public bool IsClient { get; set; }
+
+        [AllowedValues(true, ErrorMessage = "Please select at least 1 role.")]
+        public bool HasRole => IsAdmin || IsEmployee || IsClient;
     }
 }

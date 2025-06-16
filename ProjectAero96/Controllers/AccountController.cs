@@ -104,7 +104,7 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            user = model.ToEntity();
+            user = model.ToNewEntity();
             var result = await userHelper.AddUserAsync(user, model.Password);
             if (!result.Succeeded)
             {

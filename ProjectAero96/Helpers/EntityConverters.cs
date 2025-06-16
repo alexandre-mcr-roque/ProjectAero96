@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Models;
+using System.Threading.Tasks;
 
 namespace ProjectAero96.Helpers
 {
@@ -10,16 +11,16 @@ namespace ProjectAero96.Helpers
         //====================================================================
         // User Converters
         //====================================================================
-        public static async Task<UserViewModel?> ToViewModelAsync(this Task<User?> userT, IUserHelper userHelper)
+        public static async Task<UserViewModel?> ToViewModelAsync(this Task<User?> userT)
         {
             var user = await userT;
             if (user == null) return null;
-            return user.ToViewModel(userHelper);
+            return user.ToViewModel();
         }
 
-        public static UserViewModel ToViewModel(this User user, IUserHelper userHelper)
+        public static UserViewModel ToViewModel(this User user)
         {
-            return new UserViewModel
+            var model = new UserViewModel
             {
                 Id = user.Id,
                 Email = user.UserName!,
@@ -29,20 +30,38 @@ namespace ProjectAero96.Helpers
                 Address2 = user.Address2,
                 City = user.City,
                 Country = user.Country,
-                Deleted = user.Deleted,
-                Roles = string.Join(',', user.Roles.Select(ur => Enum.Parse<Roles>(ur.Role?.Name ?? "None"))),
+                Deleted = user.Deleted
             };
+            Roles roles = Roles.None;
+            foreach (var role in user.Roles.Select(ur => Enum.Parse<Roles>(ur.Role.Name!)))
+            {
+                roles |= role;
+                switch (role)
+                {
+                    case Roles.Admin:
+                        model.IsAdmin = true;
+                        break;
+                    case Roles.Employee:
+                        model.IsEmployee = true;
+                        break;
+                    case Roles.Client:
+                        model.IsClient = true;
+                        break;
+                }
+            }
+            model.Roles = roles.ToString();
+            return model;
         }
 
-        public static ICollection<UserViewModel> ToViewModels(this ICollection<User> users, IUserHelper userHelper)
+        public static ICollection<UserViewModel> ToViewModels(this ICollection<User> users)
         {
-            return users.Select(u => u.ToViewModel(userHelper))
+            return users.Select(u => u.ToViewModel())
                         .ToList();
         }
 
-        public static User ToEntity(this UserViewModel model)
+        public static async Task<User> ToNewEntityAsync(this UserViewModel model, IUserHelper userHelper)
         {
-            return new User
+            var user = new User
             {
                 Id = model.Id,
                 UserName = model.Email,
@@ -56,9 +75,25 @@ namespace ProjectAero96.Helpers
                 Country = model.Country,
                 Deleted = model.Deleted
             };
+            if (model.IsAdmin)
+            {
+                var role = await userHelper.GetRolesAsync(Roles.Admin);
+                user.Roles.Add(new UserRole { User = user, Role = role.First() });
+            }
+            if (model.IsEmployee)
+            {
+                var role = await userHelper.GetRolesAsync(Roles.Employee);
+                user.Roles.Add(new UserRole { User = user, Role = role.First() });
+            }
+            if (model.IsClient)
+            {
+                var role = await userHelper.GetRolesAsync(Roles.Client);
+                user.Roles.Add(new UserRole { User = user, Role = role.First() });
+            }
+            return user;
         }
 
-        public static User ToEntity(this RegisterViewModel model)
+        public static User ToNewEntity(this RegisterViewModel model)
         {
             return new User
             {
@@ -97,7 +132,7 @@ namespace ProjectAero96.Helpers
             return result;
         }
 
-        public static async Task<ICollection<UserRole>> ToUserRoles(this Task<IEnumerable<IdentityRole>> rolesT, User user)
+        public static async Task<ICollection<UserRole>> ToUserRolesAsync(this Task<IEnumerable<IdentityRole>> rolesT, User user)
         {
             var roles = await rolesT;
             return roles.Any() ? ToUserRoles(roles, user) : [];
