@@ -11,14 +11,37 @@ namespace ProjectAero96.Helpers
         //====================================================================
         // User Converters
         //====================================================================
-        public static async Task<UserViewModel?> ToViewModelAsync(this Task<User?> userT)
+        public static async Task<AccountViewModel?> ToAccountViewModelAsync(this Task<User?> userT)
         {
             var user = await userT;
             if (user == null) return null;
-            return user.ToViewModel();
+            return user.ToAccountViewModel();
         }
 
-        public static UserViewModel ToViewModel(this User user)
+        public static AccountViewModel ToAccountViewModel(this User user)
+        {
+            return new AccountViewModel
+            {
+                Id = user.Id,
+                Email = user.UserName!,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Address1 = user.Address1,
+                Address2 = user.Address2,
+                City = user.City,
+                Country = user.Country
+            };
+        }
+
+        public static async Task<UserViewModel?> ToUserViewModelAsync(this Task<User?> userT)
+        {
+            var user = await userT;
+            if (user == null) return null;
+            return user.ToUserViewModel();
+        }
+
+        public static UserViewModel ToUserViewModel(this User user)
         {
             var model = new UserViewModel
             {
@@ -53,9 +76,9 @@ namespace ProjectAero96.Helpers
             return model;
         }
 
-        public static ICollection<UserViewModel> ToViewModels(this ICollection<User> users)
+        public static ICollection<UserViewModel> ToUserViewModels(this ICollection<User> users)
         {
-            return users.Select(u => u.ToViewModel())
+            return users.Select(u => u.ToUserViewModel())
                         .ToList();
         }
 

@@ -116,13 +116,104 @@ namespace ProjectAero96.Controllers
             await userHelper.AddUserToRoleAsync(user, Roles.Client);
 
             await SendVerificationEmail(user);
-            ViewBag.Summary = FormSummary.Success("An email has been sent to your inbox to complete the registration.");  // Repurposed for success messages
+            ViewBag.Summary = FormSummary.Success("An email has been sent to your inbox to complete the registration."); // Repurposed for success messages
             model.Password = string.Empty;
             model.ConfirmPassword = string.Empty;
             return View(model);
         }
 
-        [Route("/accountverified")]
+        [Authorize]
+        [Route("/account/information")]
+        public async Task<IActionResult> Information()
+        {
+            var model = await userHelper.FindUserByEmailAsync(User.Identity!.Name!)
+                                        .ToAccountViewModelAsync();
+            if (model == null)
+            {
+                return NotFound();
+            }
+            return View(model);
+        }
+
+        [Authorize]
+        [Route("/account/information/edit")]
+        public async Task<IActionResult> EditInformation()
+        {
+            var model = await userHelper.FindUserByEmailAsync(User.Identity!.Name!)
+                                        .ToAccountViewModelAsync();
+            if (model == null)
+            {
+                return NotFound();
+            }
+            return View(model);
+        }
+
+
+        [Authorize]
+        [Route("/account/information/edit")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditInformation([Bind("FirstName","LastName","PhoneNumber","Address1","Address2","City","Country")]AccountViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                return View(model);
+            }
+            var user = await userHelper.FindUserByEmailAsync(User.Identity!.Name!);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Address1 = model.Address1;
+            user.Address2 = model.Address2;
+            user.City = model.City;
+            user.Country = model.Country;
+            var result = await userHelper.UpdateUserAsync(user);
+            if (!result.Succeeded)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened. Please try again later.");
+                return View(model);
+            }
+            ViewBag.Summary = FormSummary.Success("Information updated successfully.");
+            return RedirectToAction("Information");
+        }
+
+        [Authorize]
+        [Route("/account/information/changepassword")]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [Route("/account/information/changepassword")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword([Bind("Password","NewPassword","ConfirmPassword")]ChangePasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                return View();
+            }
+            var user = await userHelper.FindUserByEmailAsync(User.Identity!.Name!);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var result = await userHelper.ChangePasswordAsync(user, model.Password, model.NewPassword);
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError("Password", "The password is incorrect.");
+                return View();
+            }
+            ViewBag.Summary = FormSummary.Success("Password changed successfully.");
+            return RedirectToAction("Information");
+        }
+
+        [Route("/account/verified")]
         public async Task<IActionResult> VerifyEmail(string? uid, string? token)
         {
             if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
@@ -160,11 +251,62 @@ namespace ProjectAero96.Controllers
                     <a style="background-color:#0d6efd;padding:.375em .75em;border-radius:.25em;color:#fff;text-decoration:none;border:1px solid #0d6efd" href="{tokenLink}">Verify Registration</a>
                 </p>
                 """;
-            await mailHelper.SendEmailAsync(user.Email!, "Email Verification", body);
+            await mailHelper.SendEmailAsync(user.Email!, "Aero96 - Email Verification", body);
         }
 
-        [Route("/account/changepassword")]
-        public async Task<IActionResult> ChangePassword(string? uid, string? token)
+        [Route("/account/setpassword")]
+        public async Task<IActionResult> SetPassword(string? uid, string? token)
+        {
+            if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
+            {
+                return NotFound();
+            }
+
+            var user = await userHelper.FindUserByIdAsync(uid);
+            if (user == null || !user.RequiresPasswordChange)
+            {
+                return NotFound();
+            }
+
+            var result = await userHelper.VerifyEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                return NotFound();
+            }
+
+            return View();
+        }
+
+        [Route("/account/setpassword")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetPassword(string? uid, string? token,
+            [Bind("Password","ConfirmPassword")]SetPasswordModel model)
+        {
+            if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
+            {
+                return NotFound();
+            }
+
+            var user = await userHelper.FindUserByIdAsync(uid);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                model.Password = string.Empty;
+                model.ConfirmPassword = string.Empty;
+                return View(model);
+            }
+
+            ViewBag.Summary = FormSummary.Success("Password reset successfully. You can now sign in with your new password.");
+            return RedirectToAction("SignIn");
+        }
+
+        [Route("/account/resetpassword")]
+        public async Task<IActionResult> ResetPassword(string? uid, string? token)
         {
             if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
             {
@@ -186,10 +328,10 @@ namespace ProjectAero96.Controllers
             return View();
         }
 
-        [Route("/account/changepassword")]
+        [Route("/account/resetpassword")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(string? uid, string? token,
-            [Bind("Password","ConfirmPassword")]ChangePasswordModel model)
+        public async Task<IActionResult> ResetPassword(string? uid, string? token,
+            [Bind("Password", "ConfirmPassword")] SetPasswordModel model)
         {
             if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
             {
@@ -210,25 +352,26 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            return View();
+            ViewBag.Summary = FormSummary.Success("Password reset successfully. You can now sign in with your new password.");
+            return RedirectToAction("SignIn");
         }
 
-        public async Task SendPasswordChangeEmail(User user)
+        public async Task SendPasswordResetEmail(User user)
         {
-            var tokenLink = Url.Action("ChangePassword", "Account", new
+            var tokenLink = Url.Action("ResetPassword", "Account", new
             {
                 uid = user.Id,
-                token = await userHelper.GenerateChangePasswordTokenAsync(user)
+                token = await userHelper.GenerateResetPasswordTokenAsync(user)
             }, protocol: HttpContext.Request.Scheme);
             string body = $"""
-                <span style="font-size:2em">Change Password</span>
+                <span style="font-size:2em">Reset Password</span>
                 <p>
-                    To change your account's password, please click on the following link.
+                    To reset your account's password, please click on the following link.
                     <br><br>
-                    <a style="background-color:#0d6efd;padding:.375em .75em;border-radius:.25em;color:#fff;text-decoration:none;border:1px solid #0d6efd" href="{tokenLink}">Change Password</a>
+                    <a style="background-color:#0d6efd;padding:.375em .75em;border-radius:.25em;color:#fff;text-decoration:none;border:1px solid #0d6efd" href="{tokenLink}">Reset Password</a>
                 </p>
                 """;
-            await mailHelper.SendEmailAsync(user.Email!, "Password Change", body);
+            await mailHelper.SendEmailAsync(user.Email!, "Aero96 - Reset Password", body);
         }
     }
 }

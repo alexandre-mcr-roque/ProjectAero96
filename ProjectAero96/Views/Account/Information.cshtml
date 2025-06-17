@@ -1,0 +1,41 @@
+﻿@model AccountViewModel
+@{
+    ViewBag.Title = "Information";
+}
+<h2 class="text-center">Edit Account Information</h2>
+<div class="row">
+    <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+        <partial name="_FormSummary" />
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-3 mb-3">
+                @Html.DisplayNameFor(model => model.FullName)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.FullName)
+            </dd>
+            <dt class="col-sm-3 mb-3">
+                @Html.DisplayNameFor(model => model.Email)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Email)
+            </dd>
+            <dt class="col-sm-3 mb-3">
+                @Html.DisplayNameFor(model => model.Phone)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Phone)
+            </dd>
+            <dt class="col-sm-3 mb-3">
+                @Html.DisplayNameFor(model => model.FullAddress)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.FullAddress)
+            </dd>
+        </dl>
+        <div>
+            <a asp-action="EditInformation" class="btn btn-warning">Edit Information</a>
+            <a asp-action="ChangePassword" class="btn btn-danger">Change Password</a>
+        </div>
+    </div>
+</div>

@@ -14,10 +14,11 @@ namespace ProjectAero96.Helpers
         Task<IdentityResult> AddUserAsync(User user, string password);
         Task<IdentityResult> UpdateUserAsync(User user);
         Task<IdentityResult> SetUserDeleted(User user, bool deleted = true);
+        Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword);
         Task<string> GenerateVerifyEmailTokenAsync(User user);
         Task<IdentityResult> VerifyEmailAsync(User user, string token);
-        Task<string> GenerateChangePasswordTokenAsync(User user);
-        Task<IdentityResult> ChangePasswordAsync(User user, string token, string newPassword);
+        Task<string> GenerateResetPasswordTokenAsync(User user);
+        Task<IdentityResult> ResetPasswordAsync(User user, string token, string newPassword);
         Task<SignInResult> SignInAsync(User user, string password, bool isPersistent);
         Task SignOutAsync();
         Task CreateRoleAsync(Roles role);

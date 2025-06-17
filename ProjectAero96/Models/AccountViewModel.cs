@@ -2,8 +2,10 @@
 
 namespace ProjectAero96.Models
 {
-    public class RegisterViewModel
+    public class AccountViewModel
     {
+        public string Id { get; set; } = null!;
+
         [Required]
         [Display(Name = "First Name")]
         [MaxLength(100, ErrorMessage = "This field must have {0} characters or less.")]
@@ -14,6 +16,9 @@ namespace ProjectAero96.Models
         [MaxLength(100, ErrorMessage = "This field must have {0} characters or less.")]
         public string LastName { get; set; } = null!;
 
+        [Display(Name = "Full Name")]
+        public string FullName => $"{FirstName} {LastName}";
+
         [Required]
         [DataType(DataType.EmailAddress)]
         [Display(Name = "Email Address")]
@@ -22,6 +27,10 @@ namespace ProjectAero96.Models
         [Display(Name = "Phone Number (optional)")]
         [DataType(DataType.PhoneNumber)]
         public string? PhoneNumber { get; set; }
+        [Display(Name = "Phone Number")]
+        public string Phone => string.IsNullOrEmpty(PhoneNumber)
+            ? "None"
+            : PhoneNumber;
 
         [Required]
         [Display(Name = "Address Line 1")]
@@ -40,16 +49,11 @@ namespace ProjectAero96.Models
         [MaxLength(50, ErrorMessage = "This field must have {0} characters or less.")]
         public string Country { get; set; } = null!;
 
-        [Required]
-        [DataType(DataType.Password)]
-        [MinLength(8, ErrorMessage = "The password must be at least 8 characters long.")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$", ErrorMessage = "The password must contain at least one uppercase letter, one lowercase letter, and one digit.")]
-        public string Password { get; set; } = null!;
 
-        [Required]
-        [Display(Name = "Confirm Password")]
-        [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "The passwords do not match.")]
-        public string ConfirmPassword { get; set; } = null!;
+
+        [Display(Name = "Address")]
+        public string FullAddress => string.IsNullOrEmpty(Address2)
+            ? $"{Address1}, {City}, {Country}"
+            : $"{Address1} {Address2}, {City}, {Country}";
     }
 }

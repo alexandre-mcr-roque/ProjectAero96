@@ -81,6 +81,11 @@ namespace ProjectAero96.Helpers
             return await userManager.UpdateAsync(user);
         }
 
+        public async Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword)
+        {
+            return await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        }
+
         public async Task<string> GenerateVerifyEmailTokenAsync(User user)
         {
             return await userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -91,12 +96,12 @@ namespace ProjectAero96.Helpers
             return await userManager.ConfirmEmailAsync(user, token);
         }
 
-        public async Task<string> GenerateChangePasswordTokenAsync(User user)
+        public async Task<string> GenerateResetPasswordTokenAsync(User user)
         {
             return await userManager.GeneratePasswordResetTokenAsync(user);
         }
 
-        public async Task<IdentityResult> ChangePasswordAsync(User user, string token, string newPassword)
+        public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string newPassword)
         {
             return await userManager.ResetPasswordAsync(user, token, newPassword);
         }

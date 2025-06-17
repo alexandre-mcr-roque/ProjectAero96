@@ -82,7 +82,7 @@ namespace ProjectAero96.Controllers
         {
             if (string.IsNullOrEmpty(uid)) return NotFound();
             var model = await userHelper.FindUserByIdAsync(uid, true)
-                                        .ToViewModelAsync();
+                                        .ToUserViewModelAsync();
             if (model == null) return NotFound();
             return View(model);
         }
@@ -142,7 +142,7 @@ namespace ProjectAero96.Controllers
         public async Task<JsonResult> GetUsers()
         {
             var users = await userHelper.GetUsersWithRoleAsync();
-            return Json(new { users = users.ToViewModels() });
+            return Json(new { users = users.ToUserViewModels() });
         }
 
         [Route("/admin/users/disable/{uid}")]
@@ -198,10 +198,10 @@ namespace ProjectAero96.Controllers
         // TODO maybe change text to something more descriptive since this is a new account
         public async Task SendPasswordChangeEmail(User user)
         {
-            var tokenLink = Url.Action("ChangePassword", "Account", new
+            var tokenLink = Url.Action("SetPassword", "Account", new
             {
                 uid = user.Id,
-                token = await userHelper.GenerateChangePasswordTokenAsync(user)
+                token = await userHelper.GenerateResetPasswordTokenAsync(user)
             }, protocol: HttpContext.Request.Scheme);
             string body = $"""
                 <span style="font-size:2em">Change Password</span>
@@ -211,7 +211,7 @@ namespace ProjectAero96.Controllers
                     <a style="background-color:#0d6efd;padding:.375em .75em;border-radius:.25em;color:#fff;text-decoration:none;border:1px solid #0d6efd" href="{tokenLink}">Change Password</a>
                 </p>
                 """;
-            await mailHelper.SendEmailAsync(user.Email!, "Password Change", body);
+            await mailHelper.SendEmailAsync(user.Email!, "Aero96 - Password Change", body);
         }
 
         //================================================================
