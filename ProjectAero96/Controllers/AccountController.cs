@@ -89,7 +89,8 @@ namespace ProjectAero96.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                // Most likely missing required fields, hide form summary
+                //ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
                 model.Password = string.Empty;
                 model.ConfirmPassword = string.Empty;
                 return View(model);

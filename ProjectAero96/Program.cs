@@ -43,7 +43,8 @@ namespace ProjectAero96
 
             // Helpers
             builder.Services.AddScoped<IUserHelper, UserHelper>()
-                            .AddScoped<IMailHelper, MailHelper>();
+                            .AddScoped<IMailHelper, MailHelper>()
+                            .AddScoped<IImageHelper, ImageHelper>();
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddTransient<DbSeeder>();

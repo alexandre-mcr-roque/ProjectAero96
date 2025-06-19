@@ -1,0 +1,9 @@
+﻿.step {
+    opacity: 1;
+    transition: opacity 0.4s;
+    pointer-events: auto;
+}
+
+    .step.d-none {
+        transition: none !important;
+    }
