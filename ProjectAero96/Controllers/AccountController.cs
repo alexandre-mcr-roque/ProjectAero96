@@ -29,6 +29,12 @@ namespace ProjectAero96.Controllers
         [Route("/signin")]
         public IActionResult SignIn()
         {
+            string? summary = (string?)TempData["Summary"];
+            if (summary != null)
+            {
+                int style = (int)TempData["SummaryStyle"]!;
+                ViewBag.Summary = FormSummary.FromCode(style, summary);
+            }
             return View();
         }
 
@@ -105,7 +111,18 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            user = model.ToNewEntity();
+            user = new User
+            {
+                UserName = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
+                Address1 = model.Address1,
+                Address2 = model.Address2,
+                City = model.City,
+                Country = model.Country
+            };
             var result = await userHelper.AddUserAsync(user, model.Password);
             if (!result.Succeeded)
             {
@@ -132,6 +149,13 @@ namespace ProjectAero96.Controllers
             if (model == null)
             {
                 return NotFound();
+            }
+
+            string? summary = (string?)TempData["Summary"];
+            if (summary != null)
+            {
+                int style = (int)TempData["SummaryStyle"]!;
+                ViewBag.Summary = FormSummary.FromCode(style, summary);
             }
             return View(model);
         }
@@ -178,7 +202,9 @@ namespace ProjectAero96.Controllers
                 ViewBag.Summary = FormSummary.Danger("Something wrong happened. Please try again later.");
                 return View(model);
             }
-            ViewBag.Summary = FormSummary.Success("Information updated successfully.");
+
+            TempData["SummaryStyle"] = 2;
+            TempData["Summary"] = "Information updated successfully.";
             return RedirectToAction("Information");
         }
 
@@ -210,7 +236,9 @@ namespace ProjectAero96.Controllers
                 ModelState.AddModelError("Password", "The password is incorrect.");
                 return View();
             }
-            ViewBag.Summary = FormSummary.Success("Password changed successfully.");
+
+            TempData["SummaryStyle"] = 2;
+            TempData["Summary"] = "Password changed successfully.";
             return RedirectToAction("Information");
         }
 
@@ -302,7 +330,8 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            ViewBag.Summary = FormSummary.Success("Password reset successfully. You can now sign in with your new password.");
+            TempData["SummaryStyle"] = 2;
+            TempData["Summary"] = "Password set successfully. You can now sign in with your new password.";
             return RedirectToAction("SignIn");
         }
 
@@ -353,7 +382,8 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            ViewBag.Summary = FormSummary.Success("Password reset successfully. You can now sign in with your new password.");
+            TempData["SummaryStyle"] = 2;
+            TempData["Summary"] = "Password reset successfully. You can now sign in with your new password.";
             return RedirectToAction("SignIn");
         }
 

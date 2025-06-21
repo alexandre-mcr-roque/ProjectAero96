@@ -1,3 +1,75 @@
-﻿@{
+﻿@model CityViewModel
+@{
     Layout = "_AdminSidebar";
+}
+
+<div class="row">
+    <div class="col col-md-10 offset-md-1">
+        <partial name="_FormSummary" />
+        <table id="table-cities" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Name)</th>
+                    <th>@Html.DisplayNameFor(model => model.Country)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+@section Modals {
+    @Html.AntiForgeryToken()
+    <div class="modal fade" id="disable-modal" tabindex="-1" aria-labelledby="disable-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="disable-modal-label">Disable City?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="disable-cityid" />
+                    <p>
+                        Are you sure you want to disable this city?
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="confirm-disable">Disable City</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="restore-modal" tabindex="-1" aria-labelledby="restore-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="restore-modal-label">Restore City?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="restore-cityid" />
+                    <p>
+                        Are you sure you want to restore this city?
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="confirm-restore">Restore City</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+}
+@section Scripts {
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.min.js"></script>
+    <script src="~/lib/font-awesome/js/all.min.js"></script>
+    <script src="~/js/cities-dataTable.min.js"></script>
 }

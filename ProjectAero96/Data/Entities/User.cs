@@ -13,5 +13,8 @@ namespace ProjectAero96.Data.Entities
         public ICollection<UserRole> Roles { get; set; } = [];
         public bool RequiresPasswordChange { get; set; } = false;
         public bool Deleted { get; set; }
+        public string FullName => string.IsNullOrEmpty(LastName)
+            ? FirstName
+            : $"{FirstName} {LastName}";
     }
 }

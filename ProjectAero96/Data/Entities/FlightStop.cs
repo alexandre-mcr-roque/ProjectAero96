@@ -7,6 +7,8 @@ namespace ProjectAero96.Data.Entities
     {
         public int FlightId { get; set; }
         public byte StopIndex { get; set; }
+        public int CityId { get; set; }
+        [DeleteBehavior(DeleteBehavior.Restrict)]
         public City City { get; set; } = null!;
         public TimeOnly? FromLastStop { get; set; }
         public TimeOnly? ToNextStop { get; set; }

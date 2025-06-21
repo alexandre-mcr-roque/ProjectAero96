@@ -14,6 +14,7 @@ namespace ProjectAero96.Data.Entities
         public decimal PricePerTime { get; set; }
         public float? ChildPriceModifier { get; set; }
         public float? BabyPriceModifier { get; set; }
+        public int AirplaneId { get; set; }
         public Airplane Airplane { get; set; } = null!;
         public ICollection<FlightStop>? FlightStops { get; set; }
     }

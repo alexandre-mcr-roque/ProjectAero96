@@ -30,3 +30,9 @@ body {
     line-height: 60px;
     z-index: 1010;
 }
+
+.table-image {
+    max-width: 8em;
+    max-height: 40px;
+    width: auto;
+}

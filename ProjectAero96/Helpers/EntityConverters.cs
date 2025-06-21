@@ -82,56 +82,6 @@ namespace ProjectAero96.Helpers
                         .ToList();
         }
 
-        public static async Task<User> ToNewEntityAsync(this UserViewModel model, IUserHelper userHelper)
-        {
-            var user = new User
-            {
-                Id = model.Id,
-                UserName = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
-                Address1 = model.Address1,
-                Address2 = model.Address2,
-                City = model.City,
-                Country = model.Country,
-                Deleted = model.Deleted
-            };
-            if (model.IsAdmin)
-            {
-                var role = await userHelper.GetRolesAsync(Roles.Admin);
-                user.Roles.Add(new UserRole { User = user, Role = role.First() });
-            }
-            if (model.IsEmployee)
-            {
-                var role = await userHelper.GetRolesAsync(Roles.Employee);
-                user.Roles.Add(new UserRole { User = user, Role = role.First() });
-            }
-            if (model.IsClient)
-            {
-                var role = await userHelper.GetRolesAsync(Roles.Client);
-                user.Roles.Add(new UserRole { User = user, Role = role.First() });
-            }
-            return user;
-        }
-
-        public static User ToNewEntity(this RegisterViewModel model)
-        {
-            return new User
-            {
-                UserName = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
-                Address1 = model.Address1,
-                Address2 = model.Address2,
-                City = model.City,
-                Country = model.Country
-            };
-        }
-
         public static ICollection<UserRole> ToUserRoles(this IdentityRole role, User user)
         {
             return [ new UserRole
@@ -159,6 +109,90 @@ namespace ProjectAero96.Helpers
         {
             var roles = await rolesT;
             return roles.Any() ? ToUserRoles(roles, user) : [];
+        }
+
+        //====================================================================
+        // Airplane Converters
+        //====================================================================
+        public static async Task<AirplaneViewModel?> ToAirplaneViewModelAsync(this Task<Airplane?> airplaneT)
+        {
+            var airplane = await airplaneT;
+            if (airplane == null) return null;
+            return airplane.ToAirplaneViewModel();
+        }
+
+        public static AirplaneViewModel ToAirplaneViewModel(this Airplane airplane)
+        {
+            return new AirplaneViewModel
+            {
+                Id = airplane.Id,
+                Airline = airplane.Airline,
+                Description = airplane.Description,
+                FCSeats = airplane.FCSeats,
+                ESeats = airplane.ESeats,
+                AirlineImageId = airplane.AirlineImageId,
+                AirplaneModelId = airplane.AirplaneModelId,
+                AirplaneModel = airplane.AirplaneModel,
+                Deleted = airplane.Deleted
+            };
+        }
+
+        public static ICollection<AirplaneViewModel> ToAirplaneViewModels(this ICollection<Airplane> airplanes)
+        {
+            return airplanes.Select(a => a.ToAirplaneViewModel())
+                            .ToList();
+        }
+
+        public static async Task<ModelAirplaneViewModel?> ToModelAirplaneViewModelAsync(this Task<ModelAirplane?> airplaneModelT)
+        {
+            var model = await airplaneModelT;
+            if (model == null) return null;
+            return model.ToModelAirplaneViewModel();
+        }
+
+        public static ModelAirplaneViewModel ToModelAirplaneViewModel(this ModelAirplane airplaneModel)
+        {
+            return new ModelAirplaneViewModel
+            {
+                Id = airplaneModel.Id,
+                ModelName = airplaneModel.ModelName,
+                PricePerTime = airplaneModel.PricePerTime,
+                MaxSeats = airplaneModel.MaxSeats,
+                Deleted = airplaneModel.Deleted
+            };
+        }
+
+        public static ICollection<ModelAirplaneViewModel> ToModelAirplaneViewModels(this ICollection<ModelAirplane> airplaneModels)
+        {
+            return airplaneModels.Select(m => m.ToModelAirplaneViewModel())
+                                 .ToList();
+        }
+
+        //====================================================================
+        // City Converters
+        //====================================================================
+        public static async Task<CityViewModel?> ToCityViewModelAsync(this Task<City?> cityT)
+        {
+            var city = await cityT;
+            if (city == null) return null;
+            return city.ToCityViewModel();
+        }
+
+        public static CityViewModel ToCityViewModel(this City city)
+        {
+            return new CityViewModel
+            {
+                Id = city.Id,
+                Name = city.Name,
+                Country = city.Country,
+                Deleted = city.Deleted
+            };
+        }
+
+        public static ICollection<CityViewModel> ToCityViewModels(this ICollection<City> cities)
+        {
+            return cities.Select(c => c.ToCityViewModel())
+                         .ToList();
         }
     }
 }

@@ -1,0 +1,39 @@
+﻿@model CityViewModel
+@{
+    Layout = "_AdminSidebar";
+}
+
+<h2 class="text-center">Edit City</h2>
+<div class="row m-1">
+    <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+        <partial name="_FormSummary" />
+        <hr />
+        <form asp-action="EditCity">
+            <input asp-for="Id" type="hidden" />
+            <div class="form-group mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Country" class="form-label"></label>
+                <input asp-for="Country" class="form-control" />
+                <span asp-validation-for="Country" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <input asp-for="Deleted" class="btn-check" type="checkbox" />
+                <label asp-for="Deleted" class="btn btn-outline-danger"></label>
+                <span asp-validation-for="Deleted" class="text-danger"></span>
+            </div>
+
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-primary">Save Values</button>
+                <a asp-action="Cities" role="button" class="btn btn-secondary">Return</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

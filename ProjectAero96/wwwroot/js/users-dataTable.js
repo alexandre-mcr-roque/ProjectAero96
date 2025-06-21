@@ -72,8 +72,8 @@
                 }
             }
         ],
-        rowCallback: function (row, data) {
-            if (data.deleted) {
+        rowCallback: function (row, user) {
+            if (user.deleted) {
                 $(row).addClass('row-disabled');
             }
         }
@@ -103,14 +103,14 @@
         }));
     // Disable modal
     $('#table-users').on('click', 'button[id="disable-modal-toggle"]', function () {
-        const uid = $(this).attr('disable-target');
+        let uid = $(this).attr('disable-target');
         $('#disable-userid').val(uid);
         $('#disable-modal').modal('show');
     });
     $('#confirm-disable').on('click', function () {
-        const uid = $('#disable-userid').val();
+        let uid = $('#disable-userid').val();
         // Get the anti-forgery token value from the hidden input
-        const token = $('input[name="__RequestVerificationToken"]').val();
+        let token = $('input[name="__RequestVerificationToken"]').val();
         $.ajax({
             url: `/admin/users/disable/${uid}`,
             type: 'POST',
@@ -130,14 +130,14 @@
     });
     // Restore modal
     $('#table-users').on('click', 'button[id="restore-modal-toggle"]', function () {
-        const uid = $(this).attr('restore-target');
+        let uid = $(this).attr('restore-target');
         $('#restore-userid').val(uid);
         $('#restore-modal').modal('show');
     });
     $('#confirm-restore').on('click', function () {
-        const uid = $('#restore-userid').val();
+        let uid = $('#restore-userid').val();
         // Get the anti-forgery token value from the hidden input
-        const token = $('input[name="__RequestVerificationToken"]').val();
+        let token = $('input[name="__RequestVerificationToken"]').val();
         $.ajax({
             url: `/admin/users/restore/${uid}`,
             type: 'POST',
@@ -148,7 +148,7 @@
                 table.ajax.reload();
             },
             error: function (xhr) {
-                alert(`Error disabling user: ${xhr.responseText}`);
+                alert(`Error restoring user: ${xhr.responseText}`);
             },
             complete: function () {
                 $('#restore-modal').modal('hide');

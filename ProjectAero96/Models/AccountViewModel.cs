@@ -17,7 +17,9 @@ namespace ProjectAero96.Models
         public string LastName { get; set; } = null!;
 
         [Display(Name = "Full Name")]
-        public string FullName => $"{FirstName} {LastName}";
+        public string FullName => string.IsNullOrEmpty(LastName)
+            ? FirstName
+            : $"{FirstName} {LastName}";
 
         [Required]
         [DataType(DataType.EmailAddress)]

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectAero96.Data;
 
@@ -11,9 +12,11 @@ using ProjectAero96.Data;
 namespace ProjectAero96.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250621161319_UpdateAirplane")]
+    partial class UpdateAirplane
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,21 +151,17 @@ namespace ProjectAero96.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Airline")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("AirlineImageId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("AirplaneModelId")
                         .HasColumnType("int");
+
+                    b.Property<string>("BrandImageId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ESeats")
                         .HasColumnType("int");
@@ -280,10 +279,7 @@ namespace ProjectAero96.Migrations
 
                     b.Property<string>("ModelName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ModelNameShort")
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PricePerTime")
                         .HasColumnType("decimal(8,2)");
@@ -465,7 +461,7 @@ namespace ProjectAero96.Migrations
                     b.HasOne("ProjectAero96.Data.Entities.City", "City")
                         .WithMany()
                         .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ProjectAero96.Data.Entities.Flight", null)

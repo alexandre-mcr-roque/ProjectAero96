@@ -34,16 +34,6 @@ namespace ProjectAero96.Data
                 .HasOne(ur => ur.Role)
                 .WithMany()
                 .HasForeignKey(ur => ur.RoleId);
-
-            // Set all FK delete behaviors to restrict
-            var fks = builder.Model.GetEntityTypes()
-                .Where(e => e is IEntity)
-                .SelectMany(e => e.GetForeignKeys())
-                .Where(fk => !fk.IsOwnership);
-            foreach (var fk in fks)
-            {
-                fk.DeleteBehavior = DeleteBehavior.Restrict;
-            }
         }
     }
 }
