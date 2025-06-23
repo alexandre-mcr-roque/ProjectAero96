@@ -7,7 +7,7 @@
         });
     }
 
-    var table = $('#table-users').DataTable({
+    let table = $('#table-users').DataTable({
         layout: {
             topStart: [
                 'pageLength',

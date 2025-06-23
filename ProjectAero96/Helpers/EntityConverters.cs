@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Models;
-using System.Threading.Tasks;
 
 namespace ProjectAero96.Helpers
 {
@@ -193,6 +191,45 @@ namespace ProjectAero96.Helpers
         {
             return cities.Select(c => c.ToCityViewModel())
                          .ToList();
+        }
+
+        //====================================================================
+        // Flight Converters
+        //====================================================================
+        public static async Task<FlightViewModel?> ToFlightViewModelAsync(this Task<Flight?> flightT)
+        {
+            var flight = await flightT;
+            if (flight == null) return null;
+            return flight.ToFlightViewModel();
+        }
+
+        public static FlightViewModel ToFlightViewModel(this Flight flight)
+        {
+            return new FlightViewModel
+            {
+                Id = flight.Id,
+                DaysOfWeek = flight.DaysOfWeek,
+                DepartureTime = flight.DepartureTime,
+                ReturnTime = flight.ReturnTime,
+                Price = flight.FlightStops.Sum(fs =>
+                {
+                    var time = fs.ToNextStop.GetValueOrDefault();
+                    return flight.PricePerTime * (decimal)time.TotalHours;
+                }),
+                PricePerTime = flight.PricePerTime,
+                ChildPriceModifier = flight.ChildPriceModifier,
+                BabyPriceModifier = flight.BabyPriceModifier,
+                AirplaneId = flight.AirplaneId,
+                Airplane = flight.Airplane?.ToAirplaneViewModel() ?? null,
+                FlightStops = flight.FlightStops,
+                Deleted = flight.Deleted
+            };
+        }
+
+        public static ICollection<FlightViewModel> ToFlightViewModels(this ICollection<Flight> flights)
+        {
+            return flights.Select(f => f.ToFlightViewModel())
+                          .ToList();
         }
     }
 }

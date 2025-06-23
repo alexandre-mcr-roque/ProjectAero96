@@ -7,7 +7,7 @@
         });
     }
 
-    var table = $('#table-cities').DataTable({
+    let table = $('#table-cities').DataTable({
         layout: {
             topStart: [
                 'pageLength',

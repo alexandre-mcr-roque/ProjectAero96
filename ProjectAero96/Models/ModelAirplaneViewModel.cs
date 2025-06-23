@@ -17,6 +17,7 @@ namespace ProjectAero96.Models
 
         [Required]
         [Display(Name = "Price per Hour")]
+        [DisplayFormat(DataFormatString = "{0:C2}", ApplyFormatInEditMode = true)]
         [Range(1, 1000, ErrorMessage = "The price per hour must be between {1} and {2}.")]
         public decimal PricePerTime { get; set; }
 

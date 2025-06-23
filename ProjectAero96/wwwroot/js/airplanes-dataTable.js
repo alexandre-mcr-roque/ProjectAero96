@@ -7,7 +7,7 @@
         });
     }
 
-    var table = $('#table-airplanes').DataTable({
+    let table = $('#table-airplanes').DataTable({
         layout: {
             topStart: [
                 'pageLength',

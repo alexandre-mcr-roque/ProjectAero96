@@ -26,6 +26,24 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        @if (authed && User.IsInRole(Roles.Employee.ToString()))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-dark" role="button" href="#" data-bs-toggle="dropdown" aria-expanded="false">Flights</a>
+                                <ul class="dropdown-menu dropdown-menu-end text-sm-end">
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Flights" asp-action="Index">List of Flights</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Flights" asp-action="Create">Create Flight</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Flights" asp-action="Edit">Edit Flight</a></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Flights" asp-action="Index">Flights</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>

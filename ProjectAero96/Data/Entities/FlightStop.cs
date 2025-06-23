@@ -10,7 +10,7 @@ namespace ProjectAero96.Data.Entities
         public int CityId { get; set; }
         [DeleteBehavior(DeleteBehavior.Restrict)]
         public City City { get; set; } = null!;
-        public TimeOnly? FromLastStop { get; set; }
-        public TimeOnly? ToNextStop { get; set; }
+        public TimeSpan? FromLastStop { get; set; }
+        public TimeSpan? ToNextStop { get; set; }
     }
 }

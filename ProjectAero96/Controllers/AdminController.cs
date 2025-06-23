@@ -364,7 +364,7 @@ namespace ProjectAero96.Controllers
             return RedirectToAction("Airplanes");
         }
 
-        [Route("/admin/airplanes/edit/{id}")]
+        [Route("/admin/airplanes/edit/{id:int}")]
         public async Task<IActionResult> EditAirplane(int id)
         {
             var model = await adminRepository.GetAirplaneAsync(id)
@@ -374,7 +374,7 @@ namespace ProjectAero96.Controllers
             return View(model);
         }
 
-        [Route("/admin/airplanes/edit/{id}")]
+        [Route("/admin/airplanes/edit/{id:int}")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> EditAirplane(int id, [Bind("Id","Airline","Description","FCSeats","ESeats","AirlineImageId","AirlineImage","AirplaneModelId","Deleted")]AirplaneViewModel model)
         {
@@ -456,7 +456,7 @@ namespace ProjectAero96.Controllers
             return Json(new { airplanes = airplanes.ToAirplaneViewModels() });
         }
 
-        [Route("/admin/airplanes/disable/{id}")]
+        [Route("/admin/airplanes/disable/{id:int}")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DisableAirplane(int id)
         {
@@ -482,7 +482,7 @@ namespace ProjectAero96.Controllers
             return Ok(airplane);
         }
 
-        [Route("/admin/airplanes/restore/{id}")]
+        [Route("/admin/airplanes/restore/{id:int}")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> RestoreAirplane(int id)
         {
@@ -590,7 +590,7 @@ namespace ProjectAero96.Controllers
             return RedirectToAction("Cities");
         }
 
-        [Route("/admin/cities/edit/{id}")]
+        [Route("/admin/cities/edit/{id:int}")]
         public async Task<IActionResult> EditCity(int id)
         {
             var model = await adminRepository.GetCityAsync(id)
@@ -599,7 +599,7 @@ namespace ProjectAero96.Controllers
             return View(model);
         }
 
-        [Route("/admin/cities/edit/{id}")]
+        [Route("/admin/cities/edit/{id:int}")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCity(int id, [Bind("Id","Name","Country","Deleted")]CityViewModel model)
         {
@@ -640,7 +640,7 @@ namespace ProjectAero96.Controllers
             return Json(new { cities = cities.ToCityViewModels() });
         }
 
-        [Route("/admin/cities/disable/{id}")]
+        [Route("/admin/cities/disable/{id:int}")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DisableCity(int id)
         {
@@ -666,7 +666,7 @@ namespace ProjectAero96.Controllers
             return Ok(city);
         }
 
-        [Route("/admin/cities/restore/{id}")]
+        [Route("/admin/cities/restore/{id:int}")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> RestoreCity(int id)
         {

@@ -39,7 +39,8 @@ namespace ProjectAero96
             }).AddDefaultTokenProviders().AddEntityFrameworkStores<DataContext>();
 
             // Repositories
-            builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+            builder.Services.AddScoped<IFlightsRepository, FlightsRepository>()
+                            .AddScoped<IAdminRepository, AdminRepository>();
 
             // Helpers
             builder.Services.AddScoped<IUserHelper, UserHelper>()
