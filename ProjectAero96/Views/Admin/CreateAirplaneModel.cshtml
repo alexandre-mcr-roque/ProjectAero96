@@ -5,38 +5,50 @@
 <h2 class="text-center">Create New Airplane Model</h2>
 <div class="row m-1">
     <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3">
-        <partial name="_FormSummary" />
+        <partial name="_FormSummaryPartial" />
         <hr />
         <form asp-action="CreateAirplaneModel">
-            <div class="form-group mb-3">
-                <label asp-for="ModelName" class="form-label"></label>
-                <input asp-for="ModelName" class="form-control" />
-                <span asp-validation-for="ModelName" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="ModelNameShort" class="form-label"></label>
-                <input asp-for="ModelNameShort" class="form-control" />
-                <span asp-validation-for="ModelNameShort" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="PricePerTime" class="form-label"></label>
-                <input asp-for="PricePerTime" class="form-control" />
-                <span asp-validation-for="PricePerTime" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="MaxSeats" class="form-label"></label>
-                <input asp-for="MaxSeats" class="form-control" />
-                <span asp-validation-for="MaxSeats" class="text-danger"></span>
-            </div>
+            <div id="step1" class="step">
+                <div class="form-group mb-3">
+                    <label asp-for="ModelName" class="form-label"></label>
+                    <input asp-for="ModelName" class="form-control" />
+                    <span asp-validation-for="ModelName" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="ModelNameShort" class="form-label"></label>
+                    <input asp-for="ModelNameShort" class="form-control" />
+                    <span asp-validation-for="ModelNameShort" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="PricePerHour" class="form-label"></label>
+                    <input asp-for="PricePerHour" class="form-control" />
+                    <span asp-validation-for="PricePerHour" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="MaxSeats" class="form-label"></label>
+                    <input asp-for="MaxSeats" class="form-control" />
+                    <span asp-validation-for="MaxSeats" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <button id="open-seat-config" type="button" class="btn btn-primary paging-wz" step="2">Set Default Seat Configuration</button>
+                </div>
 
-            <div class="form-group text-center">
-                <button type="submit" class="btn btn-primary">Create Airplane Model</button>
-                <a asp-action="CreateAirplane" role="button" class="btn btn-secondary">Return</a>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">Create Airplane Model</button>
+                    <a asp-action="CreateAirplane" role="button" class="btn btn-secondary">Return</a>
+                </div>
             </div>
+            <partial name="_SeatConfigurationPartial" />
         </form>
     </div>
 </div>
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/paging-wizard.min.css" />
+    <link rel="stylesheet" href="~/css/seat-config.min.css" />
+}
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/paging-wizard.min.js"></script>
+    <script src="~/js/seat-config.min.js"></script>
 }

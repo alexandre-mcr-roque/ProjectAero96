@@ -14,14 +14,14 @@ namespace ProjectAero96.Data.Entities
         [Column(TypeName = "nvarchar(255)")]
         public string? Description { get; set; }
 
-        public ushort FCSeats { get; set; } // First Class Seats
-        public ushort ESeats { get; set; } // Economy Seats
-
         [Column(TypeName = "nvarchar(450)")]
         public string? AirlineImageId { get; set; }
 
         public int AirplaneModelId { get; set; }
         [DeleteBehavior(DeleteBehavior.Restrict)]
         public ModelAirplane AirplaneModel { get; set; } = null!;
+        public ushort SeatRows { get; set; }
+        public byte SeatColumns { get; set; }
+        public byte WindowSeats { get; set; }
     }
 }

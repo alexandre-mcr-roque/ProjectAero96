@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectAero96.Data;
 
@@ -11,9 +12,11 @@ using ProjectAero96.Data;
 namespace ProjectAero96.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250626101933_ChangePricePerTime")]
+    partial class ChangePricePerTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,14 +167,11 @@ namespace ProjectAero96.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<byte>("SeatColumns")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("SeatRows")
+                    b.Property<int>("ESeats")
                         .HasColumnType("int");
 
-                    b.Property<byte>("WindowSeats")
-                        .HasColumnType("tinyint");
+                    b.Property<int>("FCSeats")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -290,15 +290,6 @@ namespace ProjectAero96.Migrations
 
                     b.Property<decimal>("PricePerHour")
                         .HasColumnType("decimal(8,2)");
-
-                    b.Property<byte>("SeatColumns")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("SeatRows")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("WindowSeats")
-                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 

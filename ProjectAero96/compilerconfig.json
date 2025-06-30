@@ -6,5 +6,9 @@
   {
     "outputFile": "wwwroot/js/create-user.min.es5.js",
     "inputFile": "wwwroot/js/create-user.min.js"
+  },
+  {
+    "outputFile": "wwwroot/js/seat-config.es5.js",
+    "inputFile": "wwwroot/js/seat-config.js"
   }
 ]

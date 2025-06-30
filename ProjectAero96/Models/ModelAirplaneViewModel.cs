@@ -2,7 +2,7 @@
 
 namespace ProjectAero96.Models
 {
-    public class ModelAirplaneViewModel
+    public class ModelAirplaneViewModel : ISeatConfigurationModel
     {
         public int Id { get; set; }
 
@@ -19,12 +19,27 @@ namespace ProjectAero96.Models
         [Display(Name = "Price per Hour")]
         [DisplayFormat(DataFormatString = "{0:C2}", ApplyFormatInEditMode = true)]
         [Range(1, 1000, ErrorMessage = "The price per hour must be between {1} and {2}.")]
-        public decimal PricePerTime { get; set; }
+        public decimal PricePerHour { get; set; }
 
         [Required]
         [Display(Name = "Maximum amount of Seats")]
         [Range(1, 1000, ErrorMessage = "The maximum amount of seats must be between {1} and {2}.")]
-        public ushort MaxSeats { get; set; }
+        public ushort MaxSeats { get; set; } = 100;
+
+        [Required]
+        [Display(Name = "Number of Seat Rows")]
+        [Range(1, 1000, ErrorMessage = "The maximum amount of seats must be between {1} and {2}.")]
+        public ushort SeatRows { get; set; } = 1;
+
+        [Required]
+        [Display(Name = "Number of Seat Columns")]
+        [Range(1, 12, ErrorMessage = "The maximum amount of seat columns must be between {1} and {2}.")]
+        public byte SeatColumns { get; set; } = 1;
+
+        [Required]
+        [Display(Name = "Number of Seats per Window")]
+        [Range(1, 4, ErrorMessage = "The maximum amount of seats must be between {1} and {2}.")]
+        public byte WindowSeats { get; set; } = 1;
 
         [Display(Name = "Is Disabled?")]
         public bool Deleted { get; set; }

@@ -126,11 +126,12 @@ namespace ProjectAero96.Helpers
                 Id = airplane.Id,
                 Airline = airplane.Airline,
                 Description = airplane.Description,
-                FCSeats = airplane.FCSeats,
-                ESeats = airplane.ESeats,
                 AirlineImageId = airplane.AirlineImageId,
                 AirplaneModelId = airplane.AirplaneModelId,
                 AirplaneModel = airplane.AirplaneModel,
+                SeatRows = airplane.SeatRows,
+                SeatColumns = airplane.SeatColumns,
+                WindowSeats = airplane.WindowSeats,
                 Deleted = airplane.Deleted
             };
         }
@@ -154,8 +155,11 @@ namespace ProjectAero96.Helpers
             {
                 Id = airplaneModel.Id,
                 ModelName = airplaneModel.ModelName,
-                PricePerTime = airplaneModel.PricePerTime,
+                PricePerHour = airplaneModel.PricePerHour,
                 MaxSeats = airplaneModel.MaxSeats,
+                SeatRows = airplaneModel.SeatRows,
+                SeatColumns = airplaneModel.SeatColumns,
+                WindowSeats = airplaneModel.WindowSeats,
                 Deleted = airplaneModel.Deleted
             };
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Data.Repositories;
 using ProjectAero96.Helpers;
@@ -133,7 +134,7 @@ namespace ProjectAero96.Controllers
         // TODO add permanent deletion option
         [Route("/admin/users/edit/{uid}")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(string uid, [Bind("Id","FirstName","LastName","Email","PhoneNumber","Address1","Address2","City","Country","Roles")]UserViewModel model)
+        public async Task<IActionResult> EditUser(string uid, [Bind("Id","FirstName","LastName","Email","PhoneNumber","Address1","Address2","City","Country","Roles","Deleted")]UserViewModel model)
         {
             if (model.Id != uid) {
                 return NotFound();
@@ -150,7 +151,7 @@ namespace ProjectAero96.Controllers
                 TempData["Summary"] = "User does not exist.";
                 return RedirectToAction("Users");
             }
-            
+
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.Email = model.Email;
@@ -159,6 +160,7 @@ namespace ProjectAero96.Controllers
             user.Address2 = model.Address2;
             user.City = model.City;
             user.Country = model.Country;
+            user.Deleted = model.Deleted;
 
             user.Roles.Clear();
             if (model.IsAdmin)
@@ -297,7 +299,7 @@ namespace ProjectAero96.Controllers
 
         [Route("/admin/airplanes/create")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateAirplane([Bind("Airline","Description","FCSeats","ESeats","AirlineImage","AirplaneModelId")]AirplaneViewModel model)
+        public async Task<IActionResult> CreateAirplane([Bind("Airline","Description","AirlineImage","AirplaneModelId","SeatRows","SeatColumns","WindowSeats")]AirplaneViewModel model)
         {
             model.AirplaneModels = await adminRepository.GetAirplaneModelSelectItemsAsync();
             if (!ModelState.IsValid)
@@ -305,23 +307,20 @@ namespace ProjectAero96.Controllers
                 ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
                 return View(model);
             }
-            var airplaneModel = await adminRepository.GetAirplaneModelAsync(model.AirplaneModelId);
-            if (airplaneModel == null)
+
+            model.AirplaneModel = await adminRepository.GetAirplaneModelAsync(model.AirplaneModelId);
+            if (model.AirplaneModel == null)
             {
                 ViewBag.Summary = FormSummary.Danger("Airplane model does not exist.");
                 return View(model);
             }
-            int seats = model.ESeats + model.FCSeats;
-            if (seats == 0)
+
+            if (!ValidateSeatConfiguration(ModelState, model))
             {
-                ViewBag.Summary = FormSummary.Danger("The total number of seats must not be zero.");
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
                 return View(model);
             }
-            if (seats > airplaneModel.MaxSeats)
-            {
-                ViewBag.Summary = FormSummary.Danger($"The total number of seats ({model.ESeats + model.FCSeats}) exceeds the maximum allowed for this airplane model ({airplaneModel.MaxSeats}).");
-                return View(model);
-            }
+
             bool imageUploaded = true; // Set to true by default, in case no image is uploaded
             if (model.AirlineImage != null)
             {
@@ -333,8 +332,6 @@ namespace ProjectAero96.Controllers
                 Id = model.Id,
                 Airline = model.Airline,
                 Description = model.Description,
-                FCSeats = model.FCSeats,
-                ESeats = model.ESeats,
                 AirlineImageId = model.AirlineImageId,
                 AirplaneModelId = model.AirplaneModelId
             };
@@ -376,7 +373,7 @@ namespace ProjectAero96.Controllers
 
         [Route("/admin/airplanes/edit/{id:int}")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditAirplane(int id, [Bind("Id","Airline","Description","FCSeats","ESeats","AirlineImageId","AirlineImage","AirplaneModelId","Deleted")]AirplaneViewModel model)
+        public async Task<IActionResult> EditAirplane(int id, [Bind("Id","Airline","Description","AirlineImageId","AirlineImage","AirplaneModelId","SeatRows","SeatColumns","WindowSeats","Deleted")]AirplaneViewModel model)
         {
             if (model.Id != id)
             {
@@ -395,23 +392,26 @@ namespace ProjectAero96.Controllers
                 TempData["Summary"] = "Airplane does not exist.";
                 return RedirectToAction("Airplanes");
             }
-            var airplaneModel = await adminRepository.GetAirplaneModelAsync(model.AirplaneModelId);
-            if (airplaneModel == null)
+            if (model.Deleted && await adminRepository.IsAirplaneInUse(airplane))
+            {
+                ViewBag.Summary = FormSummary.Danger("Airplane is currently in use and cannot be disabled");
+                model.Deleted = false; // Reset the Deleted property to false
+                return View(model);
+            }
+
+            model.AirplaneModel = await adminRepository.GetAirplaneModelAsync(model.AirplaneModelId);
+            if (model.AirplaneModel == null)
             {
                 ViewBag.Summary = FormSummary.Danger("Airplane model does not exist.");
                 return View(model);
             }
-            int seats = model.ESeats + model.FCSeats;
-            if (seats == 0)
+
+            if (!ValidateSeatConfiguration(ModelState, model))
             {
-                ViewBag.Summary = FormSummary.Danger("The total number of seats must not be zero.");
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
                 return View(model);
             }
-            if (seats > airplaneModel.MaxSeats)
-            {
-                ViewBag.Summary = FormSummary.Danger($"The total number of seats ({model.ESeats + model.FCSeats}) exceeds the maximum allowed for this airplane model ({airplaneModel.MaxSeats}).");
-                return View(model);
-            }
+
             bool imageUploaded = true; // Set to true by default, in case no image is uploaded
             if (model.AirlineImage != null)
             {
@@ -422,8 +422,6 @@ namespace ProjectAero96.Controllers
 
             airplane.Airline = model.Airline;
             airplane.Description = model.Description;
-            airplane.FCSeats = model.FCSeats;
-            airplane.ESeats = model.ESeats;
             airplane.AirlineImageId = model.AirlineImageId;
             airplane.AirplaneModelId = model.AirplaneModelId;
             airplane.Deleted = model.Deleted;
@@ -511,14 +509,14 @@ namespace ProjectAero96.Controllers
         [Route("/admin/airplanemodels/create")]
         public IActionResult CreateAirplaneModel()
         {
-            return View();
+            return View(new ModelAirplaneViewModel());
         }
 
         [Route("/admin/airplanemodels/create")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateAirplaneModel([Bind("ModelName","ModelNameShort","PricePerTime","MaxSeats")] ModelAirplaneViewModel model)
+        public async Task<IActionResult> CreateAirplaneModel([Bind("ModelName","ModelNameShort","PricePerHour","MaxSeats","SeatRows","SeatColumns","WindowSeats")] ModelAirplaneViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || !ValidateSeatConfiguration(ModelState, model))
             {
                 TempData["SummaryStyle"] = 3;
                 TempData["Summary"] = "Something wrong happened.";
@@ -528,8 +526,11 @@ namespace ProjectAero96.Controllers
             {
                 ModelName = model.ModelName,
                 ModelNameShort = model.ModelNameShort,
-                PricePerTime = model.PricePerTime,
-                MaxSeats = model.MaxSeats
+                PricePerHour = model.PricePerHour,
+                MaxSeats = model.MaxSeats,
+                SeatRows = model.SeatRows,
+                SeatColumns = model.SeatColumns,
+                WindowSeats = model.WindowSeats
             };
             var result = await adminRepository.AddAirplaneModelAsync(airplaneModel);
             if (!result)
@@ -541,6 +542,45 @@ namespace ProjectAero96.Controllers
             TempData["SummaryStyle"] = 2;
             TempData["Summary"] = "Airplane model created successfully.";
             return RedirectToAction("CreateAirplane");
+        }
+
+        private bool ValidateSeatConfiguration(ModelStateDictionary modelState, ISeatConfigurationModel model)
+        {
+            if (model.SeatRows * model.SeatColumns > model.MaxSeats)
+            {
+                modelState.AddModelError("SeatRows", "Number of seats exceed the maximum amount of seats.");
+                modelState.AddModelError("SeatColumns", "Number of seats exceed the maximum amount of seats.");
+                return false;
+            }
+            if (model.SeatColumns == 1)
+            {
+                if (model.WindowSeats != 1)
+                {
+                    modelState.AddModelError("WindowSeats", "This configuration of window seats is invalid.");
+                    return false;
+                }
+            }
+            else
+            {
+                int centerSeats = model.SeatColumns - model.WindowSeats * 2;
+                if (centerSeats < 0 || centerSeats > 4)
+                {
+                    modelState.AddModelError("WindowSeats", "This configuration of window seats is invalid.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        [Route("/admin/airplanemodels/seat-config/{id}")]
+        public async Task<JsonResult> GetAirplaneModelSeatConfig(int id)
+        {
+            var airplaneModel = await adminRepository.GetAirplaneModelAsync(id);
+            if (airplaneModel == null)
+            {
+                return Json(0);
+            }
+            return Json(new { airplaneModel.MaxSeats, airplaneModel.SeatRows, airplaneModel.SeatColumns, airplaneModel.WindowSeats });
         }
 
         //================================================================
@@ -618,6 +658,12 @@ namespace ProjectAero96.Controllers
                 TempData["SummaryStyle"] = 3;
                 TempData["Summary"] = "City does not exist.";
                 return RedirectToAction("Cities");
+            }
+            if (model.Deleted && await adminRepository.IsCityInUse(city))
+            {
+                ViewBag.Summary = FormSummary.Danger("City is currently in use and cannot be disabled");
+                model.Deleted = false; // Reset the Deleted property to false
+                return View(model);
             }
             city.Name = model.Name;
             city.Country = model.Country;

@@ -6,63 +6,67 @@
 <h2 class="text-center">Edit Airplane</h2>
 <div class="row m-1">
     <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3">
-        <partial name="_FormSummary" />
+        <partial name="_FormSummaryPartial" />
         <hr />
         <form asp-action="EditAirplane" enctype="multipart/form-data">
-            <input asp-for="Id" type="hidden" />
-            <input asp-for="AirlineImageId" type="hidden" />
-            <div class="form-group mb-3">
-                <label asp-for="Airline" class="form-label"></label>
-                <input asp-for="Airline" class="form-control" />
-                <span asp-validation-for="Airline" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="Description" class="form-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="AirplaneModelId" class="control-label"></label>
-                <select asp-for="AirplaneModelId" asp-items="Model.AirplaneModels" class="form-control"></select>
-                <span asp-validation-for="AirplaneModelId" class="text-danger"></span>
-                <span><a asp-action="CreateAirplaneModel">Add a new airplane model.</a></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="FCSeats" class="form-label"></label>
-                <input asp-for="FCSeats" class="form-control" />
-                <span asp-validation-for="FCSeats" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="ESeats" class="form-label"></label>
-                <input asp-for="ESeats" class="form-control" />
-                <span asp-validation-for="ESeats" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="AirlineImage" class="form-label"></label>
-                <input asp-for="AirlineImage" type="file" class="form-control" />
-                <span asp-validation-for="AirlineImage" class="text-danger"></span>
-                @if (!string.IsNullOrEmpty(Model.AirlineImageId))
-                {
-                    <div class="my-3">
-                        <label class="form-label me-2">Old Image:</label>
-                        <img src="@Model.AirlineImagePath" alt="Airline Image" style="max-width: 200px; max-height: 100px;" />
-                    </div>
-                }
-            </div>
-            <div class="form-group mb-3">
-                <input asp-for="Deleted" class="btn-check" type="checkbox" />
-                <label asp-for="Deleted" class="btn btn-outline-danger"></label>
-                <span asp-validation-for="Deleted" class="text-danger"></span>
-            </div>
+            <div id="step1" class="step">
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="AirlineImageId" type="hidden" />
+                <input asp-for="MaxSeats" type="hidden" /> @* Used to save the max seats from the model airplane *@
 
-            <div class="form-group text-center">
-                <button type="submit" class="btn btn-primary">Save Values</button>
-                <a asp-action="Airplanes" role="button" class="btn btn-secondary">Return</a>
+                <div class="form-group mb-3">
+                    <label asp-for="Airline" class="form-label"></label>
+                    <input asp-for="Airline" class="form-control" />
+                    <span asp-validation-for="Airline" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="AirplaneModelId" class="control-label"></label>
+                    <select asp-for="AirplaneModelId" asp-items="Model.AirplaneModels" class="form-control"></select>
+                    <span asp-validation-for="AirplaneModelId" class="text-danger"></span>
+                    <span><a asp-action="CreateAirplaneModel">Add a new airplane model.</a></span>
+                </div>
+                <div class="form-group mb-3">
+                    <button id="open-seat-config" type="button" class="btn btn-primary paging-wz" step="2">Set Seat Configuration</button>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="AirlineImage" class="form-label"></label>
+                    <input asp-for="AirlineImage" type="file" class="form-control" />
+                    <span asp-validation-for="AirlineImage" class="text-danger"></span>
+                    @if (!string.IsNullOrEmpty(Model.AirlineImageId))
+                    {
+                        <div class="my-3">
+                            <label class="form-label me-2">Old Image:</label>
+                            <img src="@Model.AirlineImagePath" alt="Airline Image" style="max-width: 200px; max-height: 100px;" />
+                        </div>
+                    }
+                </div>
+                <div class="form-group mb-3">
+                    <input asp-for="Deleted" class="btn-check" type="checkbox" />
+                    <label asp-for="Deleted" class="btn btn-outline-danger"></label>
+                    <span asp-validation-for="Deleted" class="text-danger"></span>
+                </div>
+
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">Save Values</button>
+                    <a asp-action="Airplanes" role="button" class="btn btn-secondary">Return</a>
+                </div>
             </div>
+            <partial name="_SeatConfigurationPartial" />
         </form>
     </div>
 </div>
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/paging-wizard.min.css" />
+    <link rel="stylesheet" href="~/css/seat-config.min.css" />
+}
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/paging-wizard.min.js"></script>
+    <script src="~/js/seat-config.min.js"></script>
 }

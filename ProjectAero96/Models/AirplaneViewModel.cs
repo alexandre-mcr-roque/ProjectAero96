@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjectAero96.Data.Entities;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ProjectAero96.Models
 {
-    public class AirplaneViewModel
+    public class AirplaneViewModel : ISeatConfigurationModel
     {
         public int Id { get; set; }
 
@@ -19,14 +20,6 @@ namespace ProjectAero96.Models
         [Display(Name = "Description")]
         public string DescriptionStr => Description ?? AirplaneModel?.ToString() ?? "(No description given)";
 
-        [Required]
-        [Display(Name = "First Class Seats")]
-        public ushort FCSeats { get; set; }
-
-        [Required]
-        [Display(Name = "Economy Seats")]
-        public ushort ESeats { get; set; }
-
         [Display(Name = "Airline Image (optional)")]
         public IFormFile? AirlineImage { get; set; }
         public string? AirlineImageId { get; set; }
@@ -38,6 +31,24 @@ namespace ProjectAero96.Models
         public int AirplaneModelId { get; set; }
         public ModelAirplane? AirplaneModel { get; set; }
         public ICollection<SelectListItem>? AirplaneModels { get; set; }
+
+        [JsonIgnore]
+        public ushort MaxSeats => AirplaneModel?.MaxSeats ?? 0;
+
+        [Required]
+        [Display(Name = "Number of Seat Rows")]
+        [Range(1, 1000, ErrorMessage = "The maximum amount of seats must be between {1} and {2}.")]
+        public ushort SeatRows { get; set; } = 1;
+
+        [Required]
+        [Display(Name = "Number of Seat Columns")]
+        [Range(1, 12, ErrorMessage = "The maximum amount of seat columns must be between {1} and {2}.")]
+        public byte SeatColumns { get; set; } = 1;
+
+        [Required]
+        [Display(Name = "Number of Seats per Window")]
+        [Range(1, 4, ErrorMessage = "The maximum amount of seats must be between {1} and {2}.")]
+        public byte WindowSeats { get; set; } = 1;
 
         [Display(Name = "Is Disabled?")]
         public bool Deleted { get; set; }
