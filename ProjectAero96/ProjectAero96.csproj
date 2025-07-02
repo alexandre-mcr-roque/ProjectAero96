@@ -32,4 +32,8 @@
     <PackageReference Include="Syncfusion.Licensing" Version="29.2.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

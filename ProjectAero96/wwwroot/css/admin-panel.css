@@ -1,16 +1,4 @@
-﻿/* Loading indicator styles */
-#loadingIndicator {
-    position: absolute;
-    top: 50vh;
-    left: 50vw;
-    transform: translate(-50%, -50%);
-}
-    #loadingIndicator .spinner-border {
-        width: 6rem;
-        height: 6rem;
-    }
-
-/* DashboardLayout element styles  */
+﻿/* DashboardLayout element styles  */
 #defaultLayout {
     padding: 10px;
 }

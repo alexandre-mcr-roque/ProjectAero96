@@ -308,13 +308,15 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            model.AirplaneModel = await adminRepository.GetAirplaneModelAsync(model.AirplaneModelId);
+            model.AirplaneModel = await adminRepository.GetAirplaneModelAsync(model.AirplaneModelId)
+                                                       .ToModelAirplaneViewModelAsync();
             if (model.AirplaneModel == null)
             {
                 ViewBag.Summary = FormSummary.Danger("Airplane model does not exist.");
                 return View(model);
             }
 
+            model.MaxSeats = model.AirplaneModel.MaxSeats;
             if (!ValidateSeatConfiguration(ModelState, model))
             {
                 ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
@@ -331,10 +333,15 @@ namespace ProjectAero96.Controllers
             {
                 Id = model.Id,
                 Airline = model.Airline,
-                Description = model.Description,
                 AirlineImageId = model.AirlineImageId,
-                AirplaneModelId = model.AirplaneModelId
+                AirplaneModelId = model.AirplaneModelId,
+                MaxSeats = model.MaxSeats,
+                SeatRows = model.SeatRows,
+                SeatColumns = model.SeatColumns,
+                WindowSeats = model.WindowSeats,
             };
+            if (string.IsNullOrEmpty(model.Description)) airplane.Description = model.AirplaneModel.ToString();
+            else airplane.Description = model.Description;
             var result = await adminRepository.AddAirplaneAsync(airplane);
             if (!result)
             {
@@ -399,13 +406,15 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            model.AirplaneModel = await adminRepository.GetAirplaneModelAsync(model.AirplaneModelId);
+            model.AirplaneModel = await adminRepository.GetAirplaneModelAsync(model.AirplaneModelId)
+                                                       .ToModelAirplaneViewModelAsync();
             if (model.AirplaneModel == null)
             {
                 ViewBag.Summary = FormSummary.Danger("Airplane model does not exist.");
                 return View(model);
             }
 
+            model.MaxSeats = model.AirplaneModel.MaxSeats;
             if (!ValidateSeatConfiguration(ModelState, model))
             {
                 ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
@@ -421,9 +430,14 @@ namespace ProjectAero96.Controllers
             }
 
             airplane.Airline = model.Airline;
-            airplane.Description = model.Description;
+            if (string.IsNullOrEmpty(model.Description)) airplane.Description = model.AirplaneModel.ToString();
+            else airplane.Description = model.Description;
             airplane.AirlineImageId = model.AirlineImageId;
             airplane.AirplaneModelId = model.AirplaneModelId;
+            airplane.MaxSeats = model.MaxSeats;
+            airplane.SeatRows = model.SeatRows;
+            airplane.SeatColumns = model.SeatColumns;
+            airplane.WindowSeats = model.WindowSeats;
             airplane.Deleted = model.Deleted;
             var result = await adminRepository.UpdateAirplaneAsync(airplane);
             if (!result)

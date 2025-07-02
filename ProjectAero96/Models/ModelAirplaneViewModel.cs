@@ -17,7 +17,7 @@ namespace ProjectAero96.Models
 
         [Required]
         [Display(Name = "Price per Hour")]
-        [DisplayFormat(DataFormatString = "{0:C2}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:C2}")]
         [Range(1, 1000, ErrorMessage = "The price per hour must be between {1} and {2}.")]
         public decimal PricePerHour { get; set; }
 
@@ -43,5 +43,12 @@ namespace ProjectAero96.Models
 
         [Display(Name = "Is Disabled?")]
         public bool Deleted { get; set; }
+
+        public override string ToString()
+        {
+            return ModelNameShort != null
+                ? $"{ModelNameShort} - {SeatRows * SeatColumns} seats"
+                : $"{ModelName} - {SeatRows * SeatColumns} seats";
+        }
     }
 }

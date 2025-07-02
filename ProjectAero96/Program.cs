@@ -40,6 +40,7 @@ namespace ProjectAero96
 
             // Repositories
             builder.Services.AddScoped<IFlightsRepository, FlightsRepository>()
+                            .AddScoped<IAirplanesRepository, AirplanesRepository>()
                             .AddScoped<IAdminRepository, AdminRepository>();
 
             // Helpers

@@ -1,7 +1,5 @@
 ﻿$(function () {
     let sidebar = $('#dockSidebar')[0].ej2_instances[0];
-    $('#loadingIndicator').addClass('visually-hidden');
-    $('#adminPanel').removeClass('visually-hidden');
     $('#main-content container-fluid col-md-12').removeClass('e-content-animation');
     $('#toggle').on('click', function () {
         sidebar.toggle();

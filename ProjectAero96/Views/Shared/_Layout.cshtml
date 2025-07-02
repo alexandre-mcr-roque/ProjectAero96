@@ -30,11 +30,11 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link text-dark" role="button" href="#" data-bs-toggle="dropdown" aria-expanded="false">Flights</a>
-                                <ul class="dropdown-menu dropdown-menu-end text-sm-end">
+                                <ul class="dropdown-menu text-sm">
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Flights" asp-action="Index">List of Flights</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" asp-area="" asp-controller="Flights" asp-action="Create">Create Flight</a></li>
-                                    <li><a class="dropdown-item" asp-area="" asp-controller="Flights" asp-action="Edit">Edit Flight</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Flights" asp-action="Create">Schedule Flight</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Flights" asp-action="Edit">Edit Scheduled  Flight</a></li>
                                 </ul>
                             </li>
                         }
@@ -89,7 +89,7 @@
         </div>
     </footer>
 
-    @await RenderSectionAsync("Modals", required: false);
+    @await RenderSectionAsync("Modals", required: false)
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.min.js"></script>

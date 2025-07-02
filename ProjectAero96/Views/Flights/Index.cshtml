@@ -3,32 +3,34 @@
     ViewBag.Title = "Flights";
 }
 
-<div>
-    <label for="select-from-city">From: </label>
-    <ejs-dropdownlist id="select-from-city" dataSource="@Model.Cities" placeholder="Select a city" filterBarPlaceholder="Search" allowFiltering="true">
-        <e-dropdownlist-fields text="Text" value="Value"></e-dropdownlist-fields>
-    </ejs-dropdownlist>
-</div>
-<div>
-    <label for="select-to-city">To: </label>
-    <ejs-dropdownlist id="select-to-city" dataSource="@Model.Cities" placeholder="Select a city" filterBarPlaceholder="Search" allowFiltering="true">
-        <e-dropdownlist-fields text="Text" value="Value"></e-dropdownlist-fields>
-    </ejs-dropdownlist>
-</div>
-<div class="row">
-    <div class="col col-md-10 offset-md-1"> 
-        <partial name="_FormSummaryPartial" />
-        <table id="table-flights" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>@Html.DisplayNameFor(model => model.Id)</th>
-                    <th>@Html.DisplayNameFor(model => model.Price)</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+<partial name="_LoadingIndicatorPartial" />
+<div class="visually-hidden loadingIndicator">
+    <div>
+        <label for="select-from-city">From: </label>
+        <ejs-dropdownlist id="select-from-city" dataSource="@Model.Cities" placeholder="Select a city" filterBarPlaceholder="Search" allowFiltering="true">
+            <e-dropdownlist-fields text="Text" value="Value"></e-dropdownlist-fields>
+        </ejs-dropdownlist>
+    </div>
+    <div>
+        <label for="select-to-city">To: </label>
+        <ejs-dropdownlist id="select-to-city" dataSource="@Model.Cities" placeholder="Select a city" filterBarPlaceholder="Search" allowFiltering="true">
+            <e-dropdownlist-fields text="Text" value="Value"></e-dropdownlist-fields>
+        </ejs-dropdownlist>
+    </div>
+    <div class="row">
+        <div class="col col-md-10 offset-md-1">
+            <partial name="_FormSummaryPartial" />
+            <table id="table-flights" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.Id)</th>
+                        <th>@Html.DisplayNameFor(model => model.Price)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -36,6 +38,7 @@
     <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/29.1.33/fluent.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/loading-indicator.min.css" />
 }
 @section Scripts {
     <script src="https://cdn.syncfusion.com/ej2/29.1.33/dist/ej2.min.js"></script>
@@ -43,5 +46,6 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.min.js"></script>
     <script src="~/lib/font-awesome/js/all.min.js"></script>
-
-}
+    <script src="~/js/loading-indicator.min.js"></script>
+    <script src="~/js/flights-dataTable.js"></script>
+}   

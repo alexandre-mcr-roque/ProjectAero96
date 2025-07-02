@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjectAero96.Data.Entities
 {
@@ -7,16 +8,24 @@ namespace ProjectAero96.Data.Entities
         public int Id { get; set; }
         public bool Deleted { get; set; }
         [Column(TypeName = "tinyint")]
-        public DayOfWeek DaysOfWeek { get; set; }
-        public TimeSpan DepartureTime { get; set; }
-        public TimeSpan? ReturnTime { get; set; }
-        public bool HasReturn => ReturnTime.HasValue;
+        public DayOfWeek DayOfWeek { get; set; }
+        public TimeOnly DepartureTime { get; set; }
+        public TimeSpan FlightDuration { get; set; }
+
+        public int DepartureCityId { get; set; }
+        [DeleteBehavior(DeleteBehavior.Restrict)]
+        public City? DepartureCity { get; set; }
+
+        public int ArrivalCityId { get; set; }
+        [DeleteBehavior(DeleteBehavior.Restrict)]
+        public City? ArrivalCity { get; set; }
+
         [Column(TypeName = "decimal(8,2)")]
-        public decimal PricePerTime { get; set; }
-        public float? ChildPriceModifier { get; set; }
-        public float? BabyPriceModifier { get; set; }
+        public decimal Price { get; set; }
+        public byte ChildPricePercentage { get; set; }
+        public byte BabyPricePercentage { get; set; }
+
         public int AirplaneId { get; set; }
-        public Airplane Airplane { get; set; } = null!;
-        public ICollection<FlightStop> FlightStops { get; set; } = [];
+        public Airplane? Airplane { get; set; }
     }
 }

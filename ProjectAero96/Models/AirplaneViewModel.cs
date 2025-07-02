@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 using ProjectAero96.Data.Entities;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace ProjectAero96.Models
 {
@@ -14,12 +14,14 @@ namespace ProjectAero96.Models
         [MaxLength(100, ErrorMessage = "This field must have {0} characters or less.")]
         public string Airline { get; set; } = null!;
 
-        [Display(Name = "Description (optional)")]
+        [JsonIgnore]
+        [Display(Name = "Description")]
         [MaxLength(255, ErrorMessage = "This field must have {0} characters or less.")]
         public string? Description { get; set; }
-        [Display(Name = "Description")]
+        [JsonProperty(PropertyName = "description")]
         public string DescriptionStr => Description ?? AirplaneModel?.ToString() ?? "(No description given)";
 
+        [JsonIgnore]
         [Display(Name = "Airline Image (optional)")]
         public IFormFile? AirlineImage { get; set; }
         public string? AirlineImageId { get; set; }
@@ -29,11 +31,13 @@ namespace ProjectAero96.Models
         [Display(Name = "Airplane Model")]
         [Range(1, int.MaxValue, ErrorMessage = "You must select an airplane model.")]
         public int AirplaneModelId { get; set; }
-        public ModelAirplane? AirplaneModel { get; set; }
+        [JsonIgnore]
+        public ModelAirplaneViewModel? AirplaneModel { get; set; }
+        [JsonIgnore]
         public ICollection<SelectListItem>? AirplaneModels { get; set; }
 
         [JsonIgnore]
-        public ushort MaxSeats => AirplaneModel?.MaxSeats ?? 0;
+        public ushort MaxSeats { get; set; }
 
         [Required]
         [Display(Name = "Number of Seat Rows")]

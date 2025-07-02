@@ -17,12 +17,5 @@ namespace ProjectAero96.Data.Entities
         public ushort SeatRows { get; set; }
         public byte SeatColumns { get; set; }
         public byte WindowSeats { get; set; }
-
-        public override string ToString()
-        {
-            return ModelNameShort != null
-                ? $"{ModelNameShort} - {MaxSeats} seats - {PricePerHour:C} per hour"
-                : $"{ModelName} - {MaxSeats} seats - {PricePerHour:C} per hour";
-        }
     }
 }

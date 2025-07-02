@@ -33,7 +33,6 @@
                 }
             }
         },
-        order: [[1, 'asc']],
         ajax: {
             url: '/admin/cities/getall',
             dataSrc: getFilteredCities

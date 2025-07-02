@@ -128,7 +128,8 @@ namespace ProjectAero96.Helpers
                 Description = airplane.Description,
                 AirlineImageId = airplane.AirlineImageId,
                 AirplaneModelId = airplane.AirplaneModelId,
-                AirplaneModel = airplane.AirplaneModel,
+                AirplaneModel = airplane.AirplaneModel?.ToModelAirplaneViewModel(),
+                MaxSeats = airplane.MaxSeats,
                 SeatRows = airplane.SeatRows,
                 SeatColumns = airplane.SeatColumns,
                 WindowSeats = airplane.WindowSeats,
@@ -207,25 +208,23 @@ namespace ProjectAero96.Helpers
             return flight.ToFlightViewModel();
         }
 
-        public static FlightViewModel ToFlightViewModel(this Flight flight)
+        public static FlightViewModel ToFlightViewModel(this Flight flight, bool editMode = false)
         {
             return new FlightViewModel
             {
                 Id = flight.Id,
-                DaysOfWeek = flight.DaysOfWeek,
-                DepartureTime = flight.DepartureTime,
-                ReturnTime = flight.ReturnTime,
-                Price = flight.FlightStops.Sum(fs =>
-                {
-                    var time = fs.ToNextStop.GetValueOrDefault();
-                    return flight.PricePerTime * (decimal)time.TotalHours;
-                }),
-                PricePerTime = flight.PricePerTime,
-                ChildPriceModifier = flight.ChildPriceModifier,
-                BabyPriceModifier = flight.BabyPriceModifier,
+                DayOfWeek = flight.DayOfWeek,
+                DepartureTime = flight.DepartureTime.ToString(editMode ? "HH:mm" : "hh:mm tt"),
+                FlightDuration = flight.FlightDuration.ToString(flight.FlightDuration.Days > 0 ? @"d\.hh\:mm" : @"hh\:mm"),
+                DepartureCityId = flight.DepartureCityId,
+                DepartureCity = flight.DepartureCity?.ToCityViewModel() ?? null,
+                ArrivalCityId = flight.ArrivalCityId,
+                ArrivalCity = flight.ArrivalCity?.ToCityViewModel() ?? null,
+                Price = flight.Price,
+                ChildPricePercentage = flight.ChildPricePercentage,
+                BabyPricePercentage = flight.BabyPricePercentage,
                 AirplaneId = flight.AirplaneId,
                 Airplane = flight.Airplane?.ToAirplaneViewModel() ?? null,
-                FlightStops = flight.FlightStops,
                 Deleted = flight.Deleted
             };
         }

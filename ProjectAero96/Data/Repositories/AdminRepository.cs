@@ -88,7 +88,8 @@ namespace ProjectAero96.Data.Repositories
 
         public async Task<bool> IsCityInUse(City city)
         {
-            return await dataContext.FlightStops.AnyAsync(fs => fs.CityId == city.Id);
+            return await dataContext.Flights.AnyAsync(f => f.DepartureCityId == city.Id
+                                                        || f.ArrivalCityId == city.Id);
         }
 
         public async Task<ICollection<ModelAirplane>> GetAirplaneModelsAsync()
@@ -99,6 +100,7 @@ namespace ProjectAero96.Data.Repositories
         public async Task<ICollection<SelectListItem>> GetAirplaneModelSelectItemsAsync()
         {
             var models = await dataContext.AirplaneModels.AsNoTracking()
+                .Select(am => am.ToModelAirplaneViewModel())
                 .Select(am => new SelectListItem
                 {
                     Value = am.Id.ToString(),

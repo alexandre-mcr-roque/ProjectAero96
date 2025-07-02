@@ -14,5 +14,10 @@ namespace ProjectAero96.Models
 
         [Display(Name = "Is Disabled?")]
         public bool Deleted { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name}, {Country}";
+        }
     }
 }

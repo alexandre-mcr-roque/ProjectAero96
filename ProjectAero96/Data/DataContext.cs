@@ -18,7 +18,6 @@ namespace ProjectAero96.Data
         public DbSet<ModelAirplane> AirplaneModels { get; set; }
         public DbSet<Airplane> Airplanes { get; set; }
         public DbSet<Flight> Flights { get; set; }
-        public DbSet<FlightStop> FlightStops { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -106,7 +106,7 @@ function updateSetDefaultSeatConfigButton() {
         isInvalid = $maxSeats.attr('aria-invalid') === 'true';
     }
 
-    $('#open-seat-config').prop('disabled', isInvalid);
+    $('#open-seat-config').prop('disabled', isInvalid || $maxSeats.val() <= '0'); // double check if MaxSeats is less or equal to 0
 }
 
 $(function () {
@@ -117,23 +117,35 @@ $(function () {
 
     let $airplaneModelSelect = $('#AirplaneModelId');
     if ($airplaneModelSelect.length) {
-        $maxSeats.val(0); // Reset max seats on page load
         $airplaneModelSelect.on('change', function () {
             let id = $(this).val();
-            $.get(`/admin/airplanemodels/seat-config/${id}`)
-                .done(function (data) {
-                    $maxSeats.val(data.maxSeats);
-                    $seatRows.val(data.seatRows);
-                    $seatColumns.val(data.seatColumns);
-                    $windowSeats.val(data.windowSeats);
-                })
-                .fail(function () {
-                    $maxSeats.val(0);
-                    $seatRows.val(1);
-                    $seatColumns.val(1);
-                    $windowSeats.val(1);
-                })
-                .always(renderSeatMap);
+            if (id == '0') {
+                $maxSeats.val(0);
+                $seatRows.val(1);
+                $seatColumns.val(1);
+                $windowSeats.val(1);
+                renderSeatMap();
+                updateSetDefaultSeatConfigButton();
+            }
+            else {
+                $.get(`/admin/airplanemodels/seat-config/${id}`)
+                    .done(function (data) {
+                        $maxSeats.val(data.maxSeats);
+                        $seatRows.val(data.seatRows);
+                        $seatColumns.val(data.seatColumns);
+                        $windowSeats.val(data.windowSeats);
+                    })
+                    .fail(function () {
+                        $maxSeats.val(0);
+                        $seatRows.val(1);
+                        $seatColumns.val(1);
+                        $windowSeats.val(1);
+                    })
+                    .always(function () {
+                        renderSeatMap();
+                        updateSetDefaultSeatConfigButton();
+                    });
+            }
         });
     }
     // Run on page load and whenever MaxSeats changes or is validated
