@@ -15,10 +15,11 @@ namespace ProjectAero96.Models
         public string Airline { get; set; } = null!;
 
         [JsonIgnore]
-        [Display(Name = "Description")]
+        [Display(Name = "Description (optional)")]
         [MaxLength(255, ErrorMessage = "This field must have {0} characters or less.")]
         public string? Description { get; set; }
         [JsonProperty(PropertyName = "description")]
+        [Display(Name = "Description")]
         public string DescriptionStr => Description ?? AirplaneModel?.ToString() ?? "(No description given)";
 
         [JsonIgnore]

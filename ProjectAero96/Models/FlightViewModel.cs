@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ProjectAero96.Models
@@ -19,16 +18,31 @@ namespace ProjectAero96.Models
         [RegularExpression(@"^([0-1]?\d|2[0-3])(:[0-5]\d)$", ErrorMessage = "Please enter a valid departure time. (hh:mm)")]
         public string DepartureTime { get; set; } = "14:00";
 
+
+        //======== Flight Duration =========
         [Required]
-        [Display(Name = "Flight Duration")]
-        [RegularExpression(@"^([1-9]\d*\.00:00|([1-9]\d*\.)?((0{1,2}:(0[1-9]|[1-5]\d))|((0?[1-9]|1\d|2[0-3]):[0-5]\d)))$")]
-        public string FlightDuration { get; set; } = "1:00";
+        [Display(Name = "Hours")]
+        [Range(0, 47, ErrorMessage = "Please enter a valid number of hours (0-48).")]
+        public byte Hours { get; set; } = 1;
+
+        [Required]
+        [Display(Name = "Minutes")]
+        [Range(0, 59, ErrorMessage = "Please enter a valid number of minutes (0-59).")]
+        public byte Minutes { get; set; } = 0;
+
+        public string FlightDuration => (Hours, Minutes) switch
+        {
+            (0, _) => $"{Minutes} minute{(Minutes == 1 ? "" : "s")}",
+            (_, 0) => $"{Hours} hour{(Hours == 1 ? "" : "s")}",
+            _ => $"{Hours} hour{(Hours == 1 ? "" : "s")} and {Minutes} minute{(Minutes == 1 ? "" : "s")}"
+        };
 
         [Required]
         [Display(Name = "Departure City")]
         [Range(1, int.MaxValue, ErrorMessage = "Please select the departure city.")]
         public int DepartureCityId { get; set; }
         [JsonIgnore]
+        [Display(Name = "Departure")]
         public CityViewModel? DepartureCity { get; set; } = null!;
 
         [Required]
@@ -36,11 +50,17 @@ namespace ProjectAero96.Models
         [Range(1, int.MaxValue, ErrorMessage = "Please select the arrival city.")]
         public int ArrivalCityId { get; set; }
         [JsonIgnore]
+        [Display(Name = "Arrival")]
         public CityViewModel? ArrivalCity { get; set; } = null!;
 
         [Required]
+        [JsonIgnore]
+        [Display(Name = "Price ($)")]
         [Range(1, 999999, ErrorMessage = "Please enter a valid price.")]
         public decimal Price { get; set; }
+        [JsonProperty(PropertyName = "price")]
+        [Display(Name = "Price")]
+        public string PriceStr => $"${Price:N2}";
 
         [Required]
         [Display(Name = "Price Percentage for Children")]

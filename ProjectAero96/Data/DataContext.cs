@@ -18,6 +18,9 @@ namespace ProjectAero96.Data
         public DbSet<ModelAirplane> AirplaneModels { get; set; }
         public DbSet<Airplane> Airplanes { get; set; }
         public DbSet<Flight> Flights { get; set; }
+        public DbSet<FlightTicket> FlightTickets { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<TempInvoice> TempInvoices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

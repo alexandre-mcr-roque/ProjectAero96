@@ -46,7 +46,6 @@ function fetchFlights(airplaneId) {
 // --- Price auto-update script ---
 // Cache for airplane price per hour
 let airplanePricePerHour = null;
-
 // Fetch price per hour for the selected airplane
 function fetchPricePerHour(airplaneId) {
     if (!airplaneId || airplaneId == '0') {
@@ -61,56 +60,40 @@ function fetchPricePerHour(airplaneId) {
     });
 }
 
-// Parse a TimeSpan string (hh:mm or hh:mm:ss) to hours as decimal
-function parseTimeSpanToHours(timespan) {
-    if (!timespan) return 0;
-    // Split on '.' to separate days if present
-    let days = 0, timePart = timespan;
-    if (timespan.includes('.')) {
-        const parts = timespan.split('.');
-        days = parseInt(parts[0], 10) || 0;
-        timePart = parts[1];
-    }
-    const timeParts = timePart.split(':');
-    if (timeParts.length < 2) return 0;
-    const hours = parseInt(timeParts[0], 10) || 0;
-    const minutes = parseInt(timeParts[1], 10) || 0;
-    // Total hours = days*24 + hours + minutes/60
-    return days * 24 + hours + (minutes / 60);
+function toggleButton(airplaneId) {
+    $('button[step="2"]').toggleClass('disabled', !airplaneId || airplaneId == '0')
 }
 
-// Update the Price field if FlightDuration is valid and price per hour is known
+// Update the Price field if flight duration is valid and price per hour is known
 function updatePriceIfValid() {
-    const $duration = $('#FlightDuration');
-    const $form = $duration.closest('form');
-    if (!$duration.length || airplanePricePerHour === null) return;
+    const $hours = $('#Hours');
+    const $minutes = $('#Minutes');
+    const $form = $('form');
+    if (airplanePricePerHour === null) return;
 
     // Use jQuery validation to check if the field is valid
-    if ($form.length && $form.validate().element($duration)) {
-        const hours = parseTimeSpanToHours($duration.val());
-        if (hours > 0) {
-            const price = (hours * airplanePricePerHour).toFixed(2);
-            $('#Price').val(price);
-        }
+    if ($form.validate().element($hours)
+     && $form.validate().element($minutes)) {
+        let hours = (parseInt($('#Hours').val()) | 0) + (parseInt($('#Minutes').val()) | 0) / 60;
+        let price = (hours * airplanePricePerHour).toFixed(2);
+        $('#Price').val(price);
     }
 }
 
 $(function () {
     // Initial load if value is set
     const initialId = $('#AirplaneId').val();
-    if (initialId) {
-        fetchFlights(initialId);
-        fetchPricePerHour(initialId);
-    }
+    fetchFlights(initialId);
+    fetchPricePerHour(initialId);
+    toggleButton(initialId);
 
     // On airplane select change fetch flights and price per hour
     $('#AirplaneId').on('change', function () {
-        fetchFlights($(this).val());
-        fetchPricePerHour($(this).val());
+        let id = $(this).val();
+        fetchFlights(id);
+        fetchPricePerHour(id);
+        toggleButton(id);
     });
 
-    // On FlightDuration change, update price if valid
-    $('#FlightDuration').on('change blur', function () {
-        updatePriceIfValid();
-    });
+    $('#Hours, #Minutes').on('change blur', updatePriceIfValid);
 });

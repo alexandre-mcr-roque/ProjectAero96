@@ -10,7 +10,10 @@ namespace ProjectAero96.Data.Entities
         [Column(TypeName = "tinyint")]
         public DayOfWeek DayOfWeek { get; set; }
         public TimeOnly DepartureTime { get; set; }
-        public TimeSpan FlightDuration { get; set; }
+        
+        //======== Flight Duration =========
+        public byte Hours { get; set; }
+        public byte Minutes { get; set; }
 
         public int DepartureCityId { get; set; }
         [DeleteBehavior(DeleteBehavior.Restrict)]

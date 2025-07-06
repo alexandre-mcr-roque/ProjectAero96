@@ -21,20 +21,51 @@ namespace ProjectAero96.Data.Repositories
                 return []; // No flights if departure and arrival are the same
             }
             return await dataContext.Flights.AsNoTracking()
-                                            .Where(f => (!departureCity.HasValue || f.DepartureCityId == departureCity.Value)
-                                                        && (!arrivalCity.HasValue || f.ArrivalCityId == arrivalCity.Value))
+                                            .Include(f => f.DepartureCity)
+                                            .Include(f => f.ArrivalCity)
+                                            .Where(f => !f.Deleted
+                                                        && (!departureCity.HasValue || departureCity == 0 || f.DepartureCityId == departureCity.Value)
+                                                        && (!arrivalCity.HasValue || arrivalCity == 0 || f.ArrivalCityId == arrivalCity.Value))
+                                            .ToListAsync();
+        }
+
+        public async Task<ICollection<Flight>> GetAllFlightsWithDeletedAsync(int? departureCity, int? arrivalCity)
+        {
+            if (departureCity != null && arrivalCity != null && departureCity.Value == arrivalCity.Value)
+            {
+                return []; // No flights if departure and arrival are the same
+            }
+            return await dataContext.Flights.AsNoTracking()
+                                            .Include(f => f.DepartureCity)
+                                            .Include(f => f.ArrivalCity)
+                                            .Where(f => (!departureCity.HasValue || departureCity == 0 || f.DepartureCityId == departureCity.Value)
+                                                        && (!arrivalCity.HasValue || arrivalCity == 0 || f.ArrivalCityId == arrivalCity.Value))
                                             .ToListAsync();
         }
 
         public async Task<Flight?> GetFlightAsync(int id)
         {
             return await dataContext.Flights.AsNoTracking()
+                                            .Include(f => f.DepartureCity)
+                                            .Include(f => f.ArrivalCity)
                                             .FirstOrDefaultAsync(f => f.Id == id);
         }
 
         public async Task<bool> AddFlightAsync(Flight flight)
         {
             dataContext.Flights.Add(flight);
+            return await dataContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> UpdateFlightAsync(Flight flight)
+        {
+            dataContext.Flights.Update(flight);
+            return await dataContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> DeleteFlightAsync(Flight flight)
+        {
+            dataContext.Flights.Remove(flight);
             return await dataContext.SaveChangesAsync() > 0;
         }
 
