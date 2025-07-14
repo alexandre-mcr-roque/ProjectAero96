@@ -63,7 +63,7 @@ namespace ProjectAero96.Controllers
 
         [Route("/admin/users/create")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser([Bind("FirstName","LastName","Email","PhoneNumber","Address1","Address2","City","Country","Roles")]UserViewModel model)
+        public async Task<IActionResult> CreateUser([Bind("FirstName","LastName","BirthDate","BypassAgeCheck","Email","PhoneNumber","Address1","Address2","City","Country","Roles")]UserViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -76,12 +76,19 @@ namespace ProjectAero96.Controllers
                 ViewBag.Summary = FormSummary.Danger("There is already a registered account with the given email.");
                 return View(model);
             }
+            var birthDate = model.BirthDate.ToUniversalTime();
+            if (birthDate > DateTime.UtcNow.AddYears(-18) || model.BypassAgeCheck)
+            {
+                ViewBag.Summary = FormSummary.Danger("User must be at least 18 years old.");
+                return View(model);
+            }
             user = new User
             {
                 Id = model.Id,
                 UserName = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
+                BirthDate = birthDate,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Address1 = model.Address1,
@@ -134,7 +141,7 @@ namespace ProjectAero96.Controllers
         // TODO add permanent deletion option
         [Route("/admin/users/edit/{uid}")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(string uid, [Bind("Id","FirstName","LastName","Email","PhoneNumber","Address1","Address2","City","Country","Roles","Deleted")]UserViewModel model)
+        public async Task<IActionResult> EditUser(string uid, [Bind("Id","FirstName","LastName","BirthDate","BypassAgeCheck","Email","PhoneNumber","Address1","Address2","City","Country","Roles","Deleted")]UserViewModel model)
         {
             if (model.Id != uid) {
                 return NotFound();
@@ -152,8 +159,16 @@ namespace ProjectAero96.Controllers
                 return RedirectToAction("Users");
             }
 
+            var birthDate = model.BirthDate.ToUniversalTime();
+            if (birthDate > DateTime.UtcNow.AddYears(-18) || model.BypassAgeCheck)
+            {
+                ViewBag.Summary = FormSummary.Danger("User must be at least 18 years old.");
+                return View(model);
+            }
+
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
+            user.BirthDate = birthDate;
             user.Email = model.Email;
             user.PhoneNumber = model.PhoneNumber;
             user.Address1 = model.Address1;

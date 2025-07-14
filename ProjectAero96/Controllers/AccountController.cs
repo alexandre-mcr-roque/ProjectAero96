@@ -57,7 +57,7 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            if (user.RequiresPasswordChange)             {
+            if (user.RequiresPasswordChange) {
                 ViewBag.Summary = FormSummary.Danger("You must change your password before signing in.");
                 model.Password = string.Empty;
                 return View(model);
@@ -81,7 +81,6 @@ namespace ProjectAero96.Controllers
             }
         }
 
-        // TODO cleanup view
         [Route("/register")]
         public IActionResult Register()
         {
@@ -91,7 +90,7 @@ namespace ProjectAero96.Controllers
         // TODO add way to resend verification token
         [Route("/register")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register([Bind("FirstName","LastName","Email","PhoneNumber","Address1","Address2","City","Country","Password","ConfirmPassword")]RegisterViewModel model)
+        public async Task<IActionResult> Register([Bind("FirstName","LastName","BirthDate","Email","PhoneNumber","Address1","Address2","City","Country","Password","ConfirmPassword")]RegisterViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -110,12 +109,20 @@ namespace ProjectAero96.Controllers
                 model.ConfirmPassword = string.Empty;
                 return View(model);
             }
-
+            var birthDate = model.BirthDate.ToUniversalTime();
+            if (birthDate > DateTime.UtcNow.AddYears(-18))
+            {
+                ViewBag.Summary = FormSummary.Danger("You must be at least 18 years old to register an account.");
+                model.Password = string.Empty;
+                model.ConfirmPassword = string.Empty;
+                return View(model);
+            }
             user = new User
             {
                 UserName = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
+                BirthDate = birthDate,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Address1 = model.Address1,

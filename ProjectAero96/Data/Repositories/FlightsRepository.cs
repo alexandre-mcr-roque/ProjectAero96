@@ -69,6 +69,13 @@ namespace ProjectAero96.Data.Repositories
             return await dataContext.SaveChangesAsync() > 0;
         }
 
+        public async Task<bool> HasFlightTicketsAsync(Flight flight)
+        {
+            return await dataContext.Invoices.AsNoTracking()
+                .AnyAsync(i => i.FlightId == flight.Id
+                                && i.DepartureDay > DateOnly.FromDateTime(DateTime.UtcNow));
+        }
+
         public async Task<ICollection<SelectListItem>> GetCitySelectListItemsAsync(bool includeEmpty = false)
         {
             var cities = await dataContext.Cities.AsNoTracking()

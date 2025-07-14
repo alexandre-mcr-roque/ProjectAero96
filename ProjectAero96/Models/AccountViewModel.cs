@@ -17,9 +17,14 @@ namespace ProjectAero96.Models
         public string LastName { get; set; } = null!;
 
         [Display(Name = "Full Name")]
-        public string FullName => string.IsNullOrEmpty(LastName)
-            ? FirstName
-            : $"{FirstName} {LastName}";
+        public string FullName => $"{FirstName} {LastName}";
+
+        [Required]
+        [Display(Name = "Birth Date")]
+        [DataType(DataType.Date)]
+        [Range(typeof(DateTime), "1900-01-01", "2100-12-31",
+            ErrorMessage = "Please enter a valid date between {1} and {2}.")]
+        public DateTime BirthDate { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
@@ -50,8 +55,6 @@ namespace ProjectAero96.Models
         [Required]
         [MaxLength(50, ErrorMessage = "This field must have {0} characters or less.")]
         public string Country { get; set; } = null!;
-
-
 
         [Display(Name = "Address")]
         public string FullAddress => string.IsNullOrEmpty(Address2)

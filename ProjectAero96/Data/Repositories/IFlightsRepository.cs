@@ -11,6 +11,7 @@ namespace ProjectAero96.Data.Repositories
         Task<bool> AddFlightAsync(Flight flight);
         Task<bool> UpdateFlightAsync(Flight flight);
         Task<bool> DeleteFlightAsync(Flight flight);
+        Task<bool> HasFlightTicketsAsync(Flight flight);
         Task<ICollection<SelectListItem>> GetCitySelectListItemsAsync(bool includeEmpty = false);
         Task<ICollection<SelectListItem>> GetAirplaneSelectListItemsAsync();
         Task<City?> GetCityAsync(int id);

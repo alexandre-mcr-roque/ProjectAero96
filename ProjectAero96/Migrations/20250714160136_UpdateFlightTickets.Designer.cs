@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectAero96.Data;
 
@@ -11,9 +12,11 @@ using ProjectAero96.Data;
 namespace ProjectAero96.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250714160136_UpdateFlightTickets")]
+    partial class UpdateFlightTickets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,7 +184,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasIndex("AirplaneModelId");
 
-                    b.ToTable("Airplanes", (string)null);
+                    b.ToTable("Airplanes");
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.City", b =>
@@ -205,7 +208,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cities", (string)null);
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.Flight", b =>
@@ -257,7 +260,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasIndex("DepartureCityId");
 
-                    b.ToTable("Flights", (string)null);
+                    b.ToTable("Flights");
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.FlightTicket", b =>
@@ -290,7 +293,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasIndex("InvoiceId");
 
-                    b.ToTable("FlightTickets", (string)null);
+                    b.ToTable("FlightTickets");
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.Invoice", b =>
@@ -326,7 +329,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasIndex("FlightId");
 
-                    b.ToTable("Invoices", (string)null);
+                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.ModelAirplane", b =>
@@ -364,7 +367,7 @@ namespace ProjectAero96.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AirplaneModels", (string)null);
+                    b.ToTable("AirplaneModels");
                 });
 
             modelBuilder.Entity("ProjectAero96.Data.Entities.User", b =>

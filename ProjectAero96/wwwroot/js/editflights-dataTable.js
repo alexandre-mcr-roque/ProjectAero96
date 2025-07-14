@@ -1,4 +1,7 @@
-﻿$(function () {
+﻿// Helper: Convert .NET DayOfWeek (0=Sunday) to JS index (0=Sunday
+const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+$(function () {
     function getFilteredFlights(json) {
         const showDisabled = $('#show-disabled').is(':checked');
         // If checked, show all flights; otherwise, hide deleted flights
@@ -58,10 +61,10 @@
         if (data.deleted) {
             return (
                 '<dl>' +
-                `<dd>Departure Time: ${data.departureTime}</dd>` +
-                `<dd>Flight Duration: ${data.flightDuration}</dd>` +
-                `<dd><a href="/flights/edit/${data.id}" role="button" class="btn btn-primary btn-sm me-1">Edit flight</a>` +
-                `<a href="/flights/restore/${data.id}" role="button" class="btn btn-primary btn-sm">Restore flight</a></dd>` +
+                    `<dd>Departure Time: Every ${days[data.dayOfWeek]}, ${data.departureTime}</dd>` +
+                    `<dd>Flight Duration: ${data.flightDuration}</dd>` +
+                    `<dd><a href="/flights/edit/${data.id}" role="button" class="btn btn-primary btn-sm me-1">Edit flight</a>` +
+                    `<a href="/flights/restore/${data.id}" role="button" class="btn btn-primary btn-sm">Restore flight</a></dd>` +
                 '</dl>'
             );
         }

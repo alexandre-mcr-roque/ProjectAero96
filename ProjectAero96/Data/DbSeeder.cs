@@ -1,10 +1,8 @@
 ﻿using Humanizer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Helpers;
-using System.Data;
 
 namespace ProjectAero96.Data
 {
@@ -48,6 +46,7 @@ namespace ProjectAero96.Data
                     UserName = adminEmail,
                     FirstName = "Aero96",
                     LastName = "Administrator",
+                    BirthDate = new DateTime(2002, 9, 9),
                     Email = adminEmail,
                     EmailConfirmed = true,  // manually set email as confirmed
                     Address1 = "(Address)",
@@ -156,6 +155,7 @@ namespace ProjectAero96.Data
                     UserName = email,
                     FirstName = name,
                     LastName = i.ToString(),
+                    BirthDate = DateTime.UtcNow.AddYears(-20),
                     Email = email,
                     EmailConfirmed = true,  // manually set email as confirmed
                     Address1 = "(Address)",

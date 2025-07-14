@@ -15,6 +15,13 @@ namespace ProjectAero96.Models
         public string LastName { get; set; } = null!;
 
         [Required]
+        [Display(Name = "Birth Date")]
+        [DataType(DataType.Date)]
+        [Range(typeof(DateTime), "1900-01-01", "2100-12-31",
+            ErrorMessage = "Please enter a valid date between {1} and {2}.")]
+        public DateTime BirthDate { get; set; }
+
+        [Required]
         [DataType(DataType.EmailAddress)]
         [Display(Name = "Email Address")]
         public string Email { get; set; } = null!;

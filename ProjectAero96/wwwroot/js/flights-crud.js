@@ -1,6 +1,6 @@
-﻿// --- Flight calendar script ---
+﻿
 // Helper: Convert .NET DayOfWeek (0=Sunday) to JS index (0=Sunday)
-const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];// --- Flight calendar script ---
 
 function renderCalendar(flights) {
     // Prepare a 7-day structure

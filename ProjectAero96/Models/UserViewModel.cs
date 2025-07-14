@@ -4,6 +4,8 @@ namespace ProjectAero96.Models
 {
     public class UserViewModel : AccountViewModel
     {
+        [Display(Name = "Bypass Age Check")]
+        public bool BypassAgeCheck { get; set; }
         public string? Roles { get; set; } = null!;
         public bool Deleted { get; set; }
 

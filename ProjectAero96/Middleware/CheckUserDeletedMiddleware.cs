@@ -18,7 +18,6 @@
                 {
                     var user = await userManager.FindByIdAsync(uid);
                     // Invalid user (deleted/disabled or requires password change)
-                    // TODO Remove RequiresPasswordChange and EmailConfirmed checks if I don't add a way for admins to modify them
                     if (user == null || user.Deleted || user.RequiresPasswordChange || !user.EmailConfirmed)
                     {
                         await signInManager.SignOutAsync();

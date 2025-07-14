@@ -6,6 +6,7 @@ using ProjectAero96.Data.Entities;
 using ProjectAero96.Data.Repositories;
 using ProjectAero96.Helpers;
 using ProjectAero96.Middleware;
+using System.Globalization;
 
 namespace ProjectAero96
 {
@@ -13,6 +14,7 @@ namespace ProjectAero96
     {
         public static void Main(string[] args)
         {
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
             var builder = WebApplication.CreateBuilder(args);
 
             // Set required license keys

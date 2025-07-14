@@ -20,6 +20,11 @@
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
+                <label asp-for="BirthDate" class="form-label"></label>
+                <input asp-for="BirthDate" class="form-control" disabled />
+                <span class="text-secondary small">To change birth date, contact support</span>
+            </div>
+            <div class="form-group mb-3">
                 <label asp-for="PhoneNumber" class="form-label"></label>
                 <input asp-for="PhoneNumber" class="form-control" />
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>

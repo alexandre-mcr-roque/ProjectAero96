@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Data.Repositories;
 using ProjectAero96.Helpers;
@@ -10,12 +11,15 @@ namespace ProjectAero96.Controllers
     {
         private readonly IFlightsRepository flightsRepository;
         private readonly IAirplanesRepository airplanesRepository;
+        private readonly IUserHelper userHelper;
 
         public FlightsController(IFlightsRepository flightsRepository,
-                                 IAirplanesRepository airplanesRepository)
+                                 IAirplanesRepository airplanesRepository,
+                                 IUserHelper userHelper)
         {
             this.flightsRepository = flightsRepository;
             this.airplanesRepository = airplanesRepository;
+            this.userHelper = userHelper;
         }
 
         [Route("/flights")]
@@ -31,14 +35,55 @@ namespace ProjectAero96.Controllers
         [Route("/flights/book/{id:int}")]
         public async Task<IActionResult> Book(int id)
         {
+            // TODO https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
             var flight = await flightsRepository.GetFlightAsync(id);
             if (flight == null)
             {
                 return NotFound();
             }
-            throw new NotImplementedException("Book method not implemented yet.");
+
+            var model = new FlightBookingViewModel
+            {
+                FlightId = flight.Id
+            };
+            if (User.Identity!.IsAuthenticated)
+            {
+                var user = await userHelper.FindUserByEmailAsync(User.Identity.Name!);
+                if (user != null)
+                {
+                    model.FirstName = user.FirstName;
+                    model.LastName = user.LastName;
+                    model.BirthDate = user.BirthDate;
+                    model.Email = user.Email!;
+                    model.Tickets.Add(new FlightBookingViewModel.FlightTicket
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Age = user.Age,
+                        Email = user.Email!
+                    });
+                }
+
+            }
+            // Add a default empty ticket if no tickets have been added
+            // (most likely an anonymous booking attempt)
+            if (model.Tickets.Count == 0)
+            {
+                model.Tickets.Add(new FlightBookingViewModel.FlightTicket
+                {
+                    FirstName = string.Empty,
+                    LastName = string.Empty,
+                    Age = 0,
+                    Email = string.Empty
+                });
+            }
+            return View(model);
         }
 
+
+        //=======================================================
+        // CRUD
+        //=======================================================
         [EnumAuthorize(Roles.Employee)]
         [Route("/flights/schedule")]
         public async Task<IActionResult> Create()
@@ -302,7 +347,13 @@ namespace ProjectAero96.Controllers
                 }
             }
 
-            //TODO check if flight is in use (booked tickets for future flights)
+            if (model.Deleted && await flightsRepository.HasFlightTicketsAsync(flight))
+            {
+                ViewBag.Summary = FormSummary.Danger("Flight cannot be deleted because it has tickets booked for it.");
+                model.Deleted = false;
+                return View(model);
+            }
+
             flight.DayOfWeek = model.DayOfWeek;
             flight.DepartureTime = departureTime;
             flight.Hours = model.Hours;

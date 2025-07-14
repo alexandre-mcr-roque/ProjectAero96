@@ -1,0 +1,45 @@
+﻿
+@model FlightBookingViewModel
+@{
+    ViewBag.Title = "Book Flight";
+}
+
+<h2 class="text-center">Book Flight</h2>
+<div class="row m-1">
+    <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+        <partial name="_FormSummaryPartial" />
+        <hr />
+        <form asp-action="BookFlight" method="post">
+            <input asp-for="FlightId" type="hidden" />
+            @if (!User.Identity!.IsAuthenticated || string.IsNullOrEmpty(Model.Email))
+            {
+                <div class="form-group">
+                    <label asp-for="FirstName"></label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LastName"></label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="BirthDate"></label>
+                    <input asp-for="BirthDate" class="form-control" />
+                    <span asp-validation-for="BirthDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <hr />
+            }
+            @foreach (var ticket in Model.Tickets)
+            {
+                <partial name="_BookTicketPartial" model="ticket" />
+            }
+            <button type="submit" class="btn btn-primary">Book Flight</button>
+        </form>
+    </div>
+</div>

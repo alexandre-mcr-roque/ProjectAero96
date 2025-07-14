@@ -6,6 +6,7 @@ namespace ProjectAero96.Data.Entities
     {
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;
+        public DateTime BirthDate { get; set; } // Stored in UTC time
         public string Address1 { get; set; } = null!;
         public string? Address2 { get; set; }
         public string City { get; set; } = null!;
@@ -13,8 +14,9 @@ namespace ProjectAero96.Data.Entities
         public ICollection<UserRole> Roles { get; set; } = [];
         public bool RequiresPasswordChange { get; set; } = false;
         public bool Deleted { get; set; }
-        public string FullName => string.IsNullOrEmpty(LastName)
-            ? FirstName
-            : $"{FirstName} {LastName}";
+
+        public string FullName => $"{FirstName} {LastName}";
+
+        public int Age => (int)((DateTime.UtcNow - BirthDate).TotalDays / 365.25); // Calculate age based on birth date
     }
 }
