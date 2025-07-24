@@ -7,13 +7,12 @@ namespace ProjectAero96.Data.Entities
     {
         public int Id { get; set; }
         public bool Deleted { get; set; }
-        [Column(TypeName = "tinyint")]
-        public DayOfWeek DayOfWeek { get; set; }
-        public TimeOnly DepartureTime { get; set; }
+        public DateTimeOffset DepartureDate { get; set; }
         
         //======== Flight Duration =========
         public byte Hours { get; set; }
         public byte Minutes { get; set; }
+        public DateTimeOffset ArrivalDate { get; set; }
 
         public int DepartureCityId { get; set; }
         [DeleteBehavior(DeleteBehavior.Restrict)]

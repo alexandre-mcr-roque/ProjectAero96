@@ -7,5 +7,6 @@ namespace ProjectAero96.Data.Repositories
         Task<Airplane?> GetAirplaneAsync(int id);
         Task<Airplane?> GetAirplaneWithModelAsync(int id);
         Task<ICollection<Flight>> GetAllFlightsFromAirplaneAsync(int id);
+        Task<ICollection<Flight>> GetOverlappingFlightsFromAirplaneAsync(int id, DateTime departureDate, DateTime arrivalDate);
     }
 }

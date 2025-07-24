@@ -25,7 +25,7 @@
                     <tr>
                         <th>@Html.DisplayNameFor(model => model.DepartureCity)</th>
                         <th>@Html.DisplayNameFor(model => model.ArrivalCity)</th>
-                        <th>@Html.DisplayNameFor(model => model.PriceStr)</th>
+                        <th>@Html.DisplayNameFor(model => model.Price)</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -49,5 +49,5 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.min.js"></script>
     <script src="~/lib/font-awesome/js/all.min.js"></script>
     <script src="~/js/loading-indicator.min.js"></script>
-    <script src="~/js/flights-dataTable.js"></script>
+    <script src="~/js/flights-dataTable@(User.IsInRole("Employee") ? "-employee" : "").js"></script>
 }   

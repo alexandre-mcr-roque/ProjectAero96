@@ -1,7 +1,4 @@
-﻿// Helper: Convert .NET DayOfWeek (0=Sunday) to JS index (0=Sunday
-const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-$(function () {
+﻿$(function () {
     let fromSelect = $('#select-from-city')[0].ej2_instances[0];
     let toSelect = $('#select-to-city')[0].ej2_instances[0];
     let table = $('#table-flights').DataTable({
@@ -25,7 +22,7 @@ $(function () {
         columns: [
             { data: 'departureCity.name' },
             { data: 'arrivalCity.name' },
-            { data: 'priceStr' },
+            { data: 'price' },
             {
                 className: 'dt-control',
                 orderable: false,
@@ -40,7 +37,7 @@ $(function () {
     function format(data) {
         return (
             '<dl>' +
-                `<dd>Departure Time: Every ${days[data.dayOfWeek]}, ${data.departureTime}</dd>` +
+                `<dd>Departure Date: ${new Date(data.departureDate).toLocaleString()}</dd>` +
                 `<dd>Flight Duration: ${data.flightDuration}</dd>` +
                 `<dd><a href="/flights/book/${data.id}" role="button" class="btn btn-primary btn-sm">Book flight</a></dd>` +
             '</dl>'

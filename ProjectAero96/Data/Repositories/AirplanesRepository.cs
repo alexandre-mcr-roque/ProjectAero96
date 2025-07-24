@@ -31,5 +31,14 @@ namespace ProjectAero96.Data.Repositories
                                             .Where(f => f.AirplaneId == id)
                                             .ToListAsync();
         }
+
+        public async Task<ICollection<Flight>> GetOverlappingFlightsFromAirplaneAsync(int id, DateTime departureDate, DateTime arrivalDate)
+        {
+            return await dataContext.Flights.AsNoTracking()
+                                            .Where(f => f.AirplaneId == id &&
+                                                        f.DepartureDate <= arrivalDate &&
+                                                        f.ArrivalDate >= departureDate)
+                                            .ToListAsync();
+        }
     }
 }

@@ -88,7 +88,7 @@ namespace ProjectAero96.Controllers
         [Route("/flights/schedule")]
         public async Task<IActionResult> Create()
         {
-            var model = new FlightViewModel
+            var model = new CreateFlightViewModel
             {
                 Cities = await flightsRepository.GetCitySelectListItemsAsync(),
                 Airplanes = await flightsRepository.GetAirplaneSelectListItemsAsync()
@@ -99,7 +99,7 @@ namespace ProjectAero96.Controllers
         [EnumAuthorize(Roles.Employee)]
         [Route("/flights/schedule")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DayOfWeek","DepartureTime","FlightDuration","DepartureCityId","ArrivalCityId","Price","ChildPricePercentage","BabyPricePercentage","AirplaneId")]FlightViewModel model)
+        public async Task<IActionResult> Create([Bind("DepartureDates","Hours","Minutes","DepartureCityId","ArrivalCityId","Price","ChildPricePercentage","BabyPricePercentage","AirplaneId")]CreateFlightViewModel model)
         {
             model.Cities = await flightsRepository.GetCitySelectListItemsAsync();
             model.Airplanes = await flightsRepository.GetAirplaneSelectListItemsAsync();
@@ -151,242 +151,117 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            var flights = await airplanesRepository.GetAllFlightsFromAirplaneAsync(model.AirplaneId);
-            var dayOfWeek = model.DayOfWeek;
-            var departureTime = TimeOnly.Parse(model.DepartureTime);
-            var arrivalTime = departureTime.AddHours(model.Hours).AddMinutes(model.Minutes);
-            var arrivalDayOfWeek = arrivalTime < departureTime ? (DayOfWeek)(((int)dayOfWeek + 1) % 7) : dayOfWeek;
-
-            // Helper to get absolute minutes since week start for comparison
-            int GetMinutesOfWeek(DayOfWeek day, TimeOnly time) => ((int)day * 1440) + (time.Hour * 60) + time.Minute;
-
-            // New flight's interval in minutes since week start
-            int start = GetMinutesOfWeek(dayOfWeek, departureTime);
-            int end = GetMinutesOfWeek(arrivalDayOfWeek, arrivalTime);
-
-            // Handle flights that wrap around the week (e.g., Sunday night to Monday morning)
-            if (end <= start) end += 10080; // 7 * 1440
-
-            foreach (var f in flights)
+            // Check if flights overlap eachother
+            if (model.DepartureDates.Count > 1)
             {
-                var fDayOfWeek = f.DayOfWeek;
-                var fDepartureTime = f.DepartureTime;
-                var fArrivalTime = fDepartureTime.AddHours(f.Hours).AddMinutes(f.Minutes);
-                var fArrivalDayOfWeek = fArrivalTime < fDepartureTime ? (DayOfWeek)(((int)fDayOfWeek + 1) % 7) : fDayOfWeek;
+                // Calculate intervals for each departure date
+                var intervals = model.DepartureDates
+                    .Select(d => new
+                    {
+                        Start = d,
+                        End = d.AddHours(model.Hours).AddMinutes(model.Minutes)
+                    })
+                    .OrderBy(i => i.Start)
+                    .ToList();
 
-                int fStart = GetMinutesOfWeek(fDayOfWeek, fDepartureTime);
-                int fEnd = GetMinutesOfWeek(fArrivalDayOfWeek, fArrivalTime);
-
-                if (fEnd <= fStart)
-                    fEnd += 10080; // 7 * 1440
-
-                // Check for overlap
-                if (start < fEnd && end > fStart)
+                var overlap = await Task.Run(() =>
                 {
-                    ViewBag.Summary = FormSummary.Danger("There is already a flight scheduled for this airplane that overlaps with the selected time.");
+                    for (int i = 0; i < intervals.Count - 1; i++)
+                    {
+                        for (int j = i + 1; j < intervals.Count; j++)
+                        {
+                            // If the next interval starts before the current one ends, overlap
+                            if (intervals[j].Start < intervals[i].End)
+                                return true;
+                        }
+                    }
+                    return false;
+                });
+                if (overlap)
+                {
+                    ViewBag.Summary = FormSummary.Danger("There is an overlap between the selected departure dates.");
+                    model.DepartureDates.Clear();
                     return View(model);
                 }
             }
 
-            var flight = new Flight
+            var flights = new List<Flight>();
+            foreach (var departureDate in model.DepartureDates)
             {
-                DayOfWeek = model.DayOfWeek,
-                DepartureTime = departureTime,
-                Hours = model.Hours,
-                Minutes = model.Minutes,
-                DepartureCityId = model.DepartureCityId,
-                ArrivalCityId = model.ArrivalCityId,
-                Price = model.Price,
-                ChildPricePercentage = model.ChildPricePercentage,
-                BabyPricePercentage = model.BabyPricePercentage,
-                AirplaneId = model.AirplaneId
-            };
-            var result = await flightsRepository.AddFlightAsync(flight);
-            if (!result)
+                if (departureDate < DateTime.UtcNow.AddDays(30))
+                {
+                    ViewBag.Summary = FormSummary.Danger("Cannot schedule a flight in under 30 days.");
+                    model.DepartureDates.Clear();
+                    return View(model);
+                }
+                var arrivalDate = departureDate.AddHours(model.Hours).AddMinutes(model.Minutes);
+                var existingFlights = await airplanesRepository.GetOverlappingFlightsFromAirplaneAsync(model.AirplaneId, departureDate, arrivalDate);
+                if (existingFlights.Count > 0)
+                {
+                    ViewBag.Summary = FormSummary.Danger("There is already a flight scheduled for this airplane that overlaps with one or more selected dates.");
+                    return View(model);
+                }
+
+                var newFlight = new Flight
+                {
+                    DepartureDate = new DateTimeOffset(departureDate.Year, departureDate.Month, departureDate.Day, departureDate.Hour, departureDate.Minute, 0, TimeSpan.Zero),
+                    Hours = model.Hours,
+                    Minutes = model.Minutes,
+                    ArrivalDate = arrivalDate,
+                    DepartureCityId = model.DepartureCityId,
+                    ArrivalCityId = model.ArrivalCityId,
+                    Price = model.Price,
+                    ChildPricePercentage = model.ChildPricePercentage,
+                    BabyPricePercentage = model.BabyPricePercentage,
+                    AirplaneId = model.AirplaneId
+                };
+                flights.Add(newFlight);
+            }
+            // Clear departure dates
+            model.DepartureDates.Clear();
+            var result = await flightsRepository.AddFlightsAsync(flights);
+            if (result == 0)
             {
                 ViewBag.Summary = FormSummary.Danger("Something wrong happened. Please try again later.");
                 return View(model);
             }
-            ViewBag.Summary = FormSummary.Success("Flight created successfully.");
-            return View(model);
-        }
-
-        [EnumAuthorize(Roles.Employee)]
-        [Route("/flights/edit")]
-        public async Task<IActionResult> Edit()
-        {
-            string? summary = (string?)TempData["Summary"];
-            if (summary != null)
+            if (result < flights.Count)
             {
-                int style = (int)TempData["SummaryStyle"]!;
-                ViewBag.Summary = FormSummary.FromCode(style, summary);
-            }
-            var model = new FlightViewModel
-            {
-                Cities = await flightsRepository.GetCitySelectListItemsAsync()
-            };
-            return View(model);
-        }
-
-        [EnumAuthorize(Roles.Employee)]
-        [Route("/flights/edit/{id:int}")]
-        public async Task<IActionResult> EditFlight(int id)
-        {
-            var model = await flightsRepository.GetFlightAsync(id).ToFlightViewModelAsync();
-            if (model == null)
-            {
-                return NotFound();
-            }
-            model.Cities = await flightsRepository.GetCitySelectListItemsAsync();
-            return View(model);
-        }
-
-        [EnumAuthorize(Roles.Employee)]
-        [Route("/flights/edit/{id:int}")]
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditFlight(int id, [Bind("DayOfWeek","DepartureTime","FlightDuration","DepartureCityId","ArrivalCityId","Price","ChildPricePercentage","BabyPricePercentage","AirplaneId","Deleted")]FlightViewModel model)
-        {
-            model.Cities = await flightsRepository.GetCitySelectListItemsAsync();
-            model.Airplanes = await flightsRepository.GetAirplaneSelectListItemsAsync();
-         
-            if (model.Id != id)
-            {
-                return NotFound();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                ViewBag.Summary = FormSummary.Warning("One or more flights failed to be created.");
                 return View(model);
             }
+            if (result == 1) ViewBag.Summary = FormSummary.Success("Flight created successfully.");
+            else ViewBag.Summary = FormSummary.Success("Flights created successfully.");
+            return View(model);
+        }
 
-            var flight = await flightsRepository.GetFlightAsync(model.Id);
+        [EnumAuthorize(Roles.Employee)]
+        [Route("/flights/unschedule/{id}")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteFlight(int id)
+        {
+            var flight = await flightsRepository.GetFlightAsync(id);
             if (flight == null)
             {
-                TempData["SummaryStyle"] = 3;
-                TempData["Summary"] = "Flight does not exist.";
-                return RedirectToAction("Edit");
+                return NotFound("Flight does not exist");
             }
-
-            var airplane = await airplanesRepository.GetAirplaneAsync(model.AirplaneId);
-            if (airplane == null)
+            if (await flightsRepository.HasFlightTicketsAsync(flight))
             {
-                ViewBag.Summary = FormSummary.Danger("Airplane does not exist.");
-                model.AirplaneId = 0;
-                return View(model);
+                // In a real scenario, we would add a refund process here instead of preventing deletion
+                return NotFound("Flight already has reservations and cannot be unscheduled");
             }
-
-            var departureCity = await flightsRepository.GetCityAsync(model.DepartureCityId);
-            if (departureCity == null)
-            {
-                ViewBag.Summary = FormSummary.Danger("Departure city does not exist.");
-                model.DepartureCityId = 0;
-                return View(model);
-            }
-
-            var arrivalCity = await flightsRepository.GetCityAsync(model.ArrivalCityId);
-            if (arrivalCity == null)
-            {
-                ViewBag.Summary = FormSummary.Danger("Arrival city does not exist.");
-                model.ArrivalCityId = 0;
-                return View(model);
-            }
-
-            if (model.DepartureCityId == model.ArrivalCityId)
-            {
-                ViewBag.Summary = FormSummary.Danger("Departure city and arrival city cannot be the same.");
-                return View(model);
-            }
-
-            if (model.Hours == 0 && model.Minutes == 0)
-            {
-                ViewBag.Summary = FormSummary.Danger("Flight duration cannot be zero.");
-                return View(model);
-            }
-
-            if (model.Hours == 48 && model.Minutes > 0)
-            {
-                ViewBag.Summary = FormSummary.Danger("Flight duration cannot be more than 48 hours.");
-                return View(model);
-            }
-
-            var flights = await airplanesRepository.GetAllFlightsFromAirplaneAsync(model.AirplaneId);
-            var dayOfWeek = model.DayOfWeek;
-            var departureTime = TimeOnly.Parse(model.DepartureTime);
-            var arrivalTime = departureTime.AddHours(model.Hours).AddMinutes(model.Minutes);
-            var arrivalDayOfWeek = arrivalTime < departureTime ? (DayOfWeek)(((int)dayOfWeek + 1) % 7) : dayOfWeek;
-
-            // Helper to get absolute minutes since week start for comparison
-            int GetMinutesOfWeek(DayOfWeek day, TimeOnly time) => ((int)day * 1440) + (time.Hour * 60) + time.Minute;
-
-            // New flight's interval in minutes since week start
-            int start = GetMinutesOfWeek(dayOfWeek, departureTime);
-            int end = GetMinutesOfWeek(arrivalDayOfWeek, arrivalTime);
-
-            // Handle flights that wrap around the week (e.g., Sunday night to Monday morning)
-            if (end <= start) end += 10080; // 7 * 1440
-
-            foreach (var f in flights)
-            {
-                var fDayOfWeek = f.DayOfWeek;
-                var fDepartureTime = f.DepartureTime;
-                var fArrivalTime = fDepartureTime.AddHours(f.Hours).AddMinutes(f.Minutes);
-                var fArrivalDayOfWeek = fArrivalTime < fDepartureTime ? (DayOfWeek)(((int)fDayOfWeek + 1) % 7) : fDayOfWeek;
-
-                int fStart = GetMinutesOfWeek(fDayOfWeek, fDepartureTime);
-                int fEnd = GetMinutesOfWeek(fArrivalDayOfWeek, fArrivalTime);
-
-                if (fEnd <= fStart)
-                    fEnd += 10080; // 7 * 1440
-
-                // Check for overlap
-                if (start < fEnd && end > fStart)
-                {
-                    ViewBag.Summary = FormSummary.Danger("There is already a flight scheduled for this airplane that overlaps with the selected time.");
-                    return View(model);
-                }
-            }
-
-            if (model.Deleted && await flightsRepository.HasFlightTicketsAsync(flight))
-            {
-                ViewBag.Summary = FormSummary.Danger("Flight cannot be deleted because it has tickets booked for it.");
-                model.Deleted = false;
-                return View(model);
-            }
-
-            flight.DayOfWeek = model.DayOfWeek;
-            flight.DepartureTime = departureTime;
-            flight.Hours = model.Hours;
-            flight.Minutes = model.Minutes;
-            flight.DepartureCityId = model.DepartureCityId;
-            flight.ArrivalCityId = model.ArrivalCityId;
-            flight.Price = model.Price;
-            flight.ChildPricePercentage = model.ChildPricePercentage;
-            flight.BabyPricePercentage = model.BabyPricePercentage;
-            flight.AirplaneId = model.AirplaneId;
-            flight.Deleted = model.Deleted;
-            var result = await flightsRepository.UpdateFlightAsync(flight);
+            var result = await flightsRepository.DeleteFlightAsync(flight);
             if (!result)
             {
-                ViewBag.Summary = FormSummary.Danger("Something wrong happened. Please try again later.");
-                return View(model);
+                return NotFound("Unknown error");
             }
-            ViewBag.Summary = FormSummary.Success("Flight created successfully.");
-            return View(model);
+            return Ok(flight);
         }
 
         [Route("/flights/getall")]
         public async Task<JsonResult> GetFlights(int? from, int? to)
         {
             var flights = await flightsRepository.GetAllFlightsAsync(from, to);
-            return Json(new { flights = flights.ToFlightViewModels() });
-        }
-
-        [EnumAuthorize(Roles.Employee)]
-        [Route("/flights/getall/include-deleted")]
-        public async Task<JsonResult> GetFlightsWithDeleted(int? from, int? to)
-        {
-            var flights = await flightsRepository.GetAllFlightsWithDeletedAsync(from, to);
             return Json(new { flights = flights.ToFlightViewModels() });
         }
     }

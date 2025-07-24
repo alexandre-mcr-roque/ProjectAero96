@@ -57,6 +57,12 @@ namespace ProjectAero96.Data.Repositories
             return await dataContext.SaveChangesAsync() > 0;
         }
 
+        public async Task<int> AddFlightsAsync(ICollection<Flight> flights)
+        {
+            dataContext.Flights.AddRange(flights);
+            return await dataContext.SaveChangesAsync();
+        }
+
         public async Task<bool> UpdateFlightAsync(Flight flight)
         {
             dataContext.Flights.Update(flight);

@@ -213,15 +213,15 @@ namespace ProjectAero96.Helpers
             return new FlightViewModel
             {
                 Id = flight.Id,
-                DayOfWeek = flight.DayOfWeek,
-                DepartureTime = flight.DepartureTime.ToString(editMode ? "HH:mm" : "hh:mm tt"),
+                DepartureDate = flight.DepartureDate.UtcDateTime,
                 Hours = flight.Hours,
                 Minutes = flight.Minutes,
+                ArrivalDate = flight.ArrivalDate.UtcDateTime,
                 DepartureCityId = flight.DepartureCityId,
                 DepartureCity = flight.DepartureCity?.ToCityViewModel() ?? null,
                 ArrivalCityId = flight.ArrivalCityId,
                 ArrivalCity = flight.ArrivalCity?.ToCityViewModel() ?? null,
-                Price = flight.Price,
+                Price = $"${flight.Price:N2}",
                 ChildPricePercentage = flight.ChildPricePercentage,
                 BabyPricePercentage = flight.BabyPricePercentage,
                 AirplaneId = flight.AirplaneId,

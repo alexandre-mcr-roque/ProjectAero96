@@ -2,27 +2,12 @@
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 $(function () {
-    function getFilteredFlights(json) {
-        const showDisabled = $('#show-disabled').is(':checked');
-        // If checked, show all flights; otherwise, hide deleted flights
-        return json.flights.filter(function (flight) {
-            return showDisabled || !flight.deleted;
-        });
-    }
-
     let fromSelect = $('#select-from-city')[0].ej2_instances[0];
     let toSelect = $('#select-to-city')[0].ej2_instances[0];
     let table = $('#table-flights').DataTable({
         layout: {
             topStart: null,
-            topEnd: {
-                div: {
-                    className: 'dataTable-feature',
-                    id: 'show-disabled-container',
-                    html: '<label for="show-disabled" class="form-check-label me-2">Show disabled flights</label>'
-                        + '<input type="checkbox" id="show-disabled" class="form-check-input">'
-                }
-            },
+            topEnd: null,
             bottomEnd: [
                 'paging',
                 'pageLength'
@@ -30,8 +15,8 @@ $(function () {
         },
         //order: [[1, 'asc']],
         ajax: {
-            url: '/flights/getall/include-deleted',
-            dataSrc: getFilteredFlights
+            url: '/flights/getall',
+            dataSrc: 'flights'
         },
         processing: true,
         columnDefs: [
@@ -47,33 +32,18 @@ $(function () {
                 data: null,
                 defaultContent: ''
             }
-        ],
-        rowCallback: function (row, flight) {
-            if (flight.deleted) {
-                $(row).addClass('row-disabled');
-            }
-        }
+        ]
     });
     table.processing(false);
 
     // Formatting function for row details
     function format(data) {
-        if (data.deleted) {
-            return (
-                '<dl>' +
-                    `<dd>Departure Time: Every ${days[data.dayOfWeek]}, ${data.departureTime}</dd>` +
-                    `<dd>Flight Duration: ${data.flightDuration}</dd>` +
-                    `<dd><a href="/flights/edit/${data.id}" role="button" class="btn btn-primary btn-sm me-1">Edit flight</a>` +
-                    `<a href="/flights/restore/${data.id}" role="button" class="btn btn-primary btn-sm">Restore flight</a></dd>` +
-                '</dl>'
-            );
-        }
+        debugger;
         return (
             '<dl>' +
-                `<dd>Departure Time: ${data.departureTime}</dd>` +
+                `<dd>Departure Date: ${new Date(data.departureDate).toLocaleString()}</dd>` +
                 `<dd>Flight Duration: ${data.flightDuration}</dd>` +
-                `<dd><a href="/flights/edit/${data.id}" role="button" class="btn btn-primary btn-sm me-1">Edit flight</a>` +
-                `<a href="/flights/disable/${data.id}" role="button" class="btn btn-danger btn-sm">Disable flight</a></dd>` +
+            `<dd><a href="/flights/book/${data.id}" role="button" class="btn btn-primary btn-sm">Book flight</a> <a href="/flights/unschedule/${data.id}" role="button" class="btn btn-danger btn-sm">Unschedule flight</a></dd>` +
             '</dl>'
         );
     }
@@ -93,7 +63,6 @@ $(function () {
     });
 
     function updateTable() {
-
         let from = Number(fromSelect.value);
         let to = Number(toSelect.value);
         if ((from > 0 || to > 0) && from != to) {
@@ -103,8 +72,12 @@ $(function () {
         }
         table.ajax.reload();
     }
-    fromSelect.value = null;
+    fromSelect.value = "";
+    fromSelect.text = "";
+    fromSelect.index = "";
     fromSelect.change = updateTable;
-    toSelect.value = null;
+    toSelect.value = "";
+    toSelect.text = "";
+    toSelect.index = "";
     toSelect.change = updateTable;
 });

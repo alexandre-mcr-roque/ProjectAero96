@@ -1,4 +1,4 @@
-﻿@model FlightViewModel
+﻿@model CreateFlightViewModel
 @{
     ViewBag.Title = "Schedule Flight";
 }
@@ -38,36 +38,48 @@
                     </ejs-dropdownlist>
                     <span asp-validation-for="ArrivalCityId" class="text-danger"></span>
                 </div>
-                <br />
                 <div class="form-group mb-3">
-                    <label asp-for="DayOfWeek" class="form-label"></label>
-                    <select asp-for="DayOfWeek" class="form-control">
-                        <option value="0">Sunday</option>
-                        <option value="1">Monday</option>
-                        <option value="2">Tuesday</option>
-                        <option value="3">Wednesday</option>
-                        <option value="4">Thursday</option>
-                        <option value="5">Friday</option>
-                        <option value="6">Saturday</option>
-                    </select>
-                    <span asp-validation-for="DayOfWeek" class="text-danger"></span>
+                    <label class="form-label mb-2">Flight Duration</label>
+                    <div class="form-group mb-1">
+                        <label asp-for="Hours" class="form-label"></label>
+                        <input asp-for="Hours" class="form-control" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Minutes" class="form-label"></label>
+                        <input asp-for="Minutes" class="form-control" />
+                    </div>
                 </div>
-                <div class="form-group mb-3">
-                    <label asp-for="DepartureTime" class="form-label"></label>
-                    <input asp-for="DepartureTime" class="form-control" />
-                    <span asp-validation-for="DepartureTime" class="text-danger"></span>
-                </div>
-                <br />
-                <h4>Flight Duration</h4>
-                <div class="form-group mb-3">
-                    <label asp-for="Hours" class="form-label"></label>
-                    <input asp-for="Hours" class="form-control" />
-                    <span asp-validation-for="Hours" class="text-danger"></span>
-                </div>
-                <div class="form-group mb-3">
-                    <label asp-for="Minutes" class="form-label"></label>
-                    <input asp-for="Minutes" class="form-control" />
-                    <span asp-validation-for="Minutes" class="text-danger"></span>
+                <label asp-for="DepartureDates" class="form-label"></label>
+                <div class="mb-3">
+                    <div class="card p-3 mb-3">
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="newDepartureDate">Departure Date (UTC)</label>
+                            <input type="datetime-local" class="form-control" id="newDepartureDate" />
+                        </div>
+                        <div class="form-group mb-1">
+                            <button type="button" class="btn btn-success" id="addDepartureDateBtn">
+                                <i class="bi bi-plus"></i> Add Date
+                            </button>
+                        </div>
+                    </div>
+
+                    <ul class="list-group" id="departureDatesList">
+                        @if (Model != null && Model.DepartureDates.Count() > 0)
+                        {
+                            for (int i = 0; i < Model.DepartureDates.Count(); i++)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center" data-index="@i">
+                                    <div>
+                                        <strong>Departure:</strong> @Model.DepartureDates.ElementAt(i)
+                                    </div>
+                                    <button type="button" class="btn btn-danger btn-sm remove-date-btn" data-index="@i">
+                                        <i class="bi bi-x"></i> Remove
+                                    </button>
+                                    <input type="hidden" name="DatesOfFlight[@i].DepartureDate" value="@Model.DepartureDates.ElementAt(i).ToUniversalTime().ToString("s")" />
+                                </li>
+                            }
+                        }
+                    </ul>
                 </div>
 
                 <div class="form-group d-flex justify-content-between">
@@ -101,7 +113,6 @@
     </div>
 </div>
 
-
 @section Styles {
     <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/29.1.33/bootstrap5.css" />
     <link rel="stylesheet" href="~/css/paging-wizard.min.css" />
@@ -111,5 +122,5 @@
     <script src="https://cdn.syncfusion.com/ej2/29.1.33/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
     <script src="~/js/paging-wizard.min.js"></script>
-    <script src="~/js/flights-crud.min.js"></script>
+    <script src="~/js/flights-crud.js"></script>
 }

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MimeKit;
 using ProjectAero96.Data;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Data.Repositories;
