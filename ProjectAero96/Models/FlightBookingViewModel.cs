@@ -6,8 +6,7 @@ namespace ProjectAero96.Models
     public class FlightBookingViewModel
     {
         public int FlightId { get; set; } // Flight ID
-        public DateTime FlightDate { get; set; }
-        public ICollection<FlightTicket> Tickets { get; set; } = [];
+        public ICollection<FlightTicket> Tickets { get; set; } = [new FlightTicket()];
 
         public class FlightTicket
         {
@@ -48,11 +47,28 @@ namespace ProjectAero96.Models
         [DataType(DataType.Date)]
         [Range(typeof(DateTime), "1900-01-01", "2100-12-31",
             ErrorMessage = "Please enter a valid date between {1} and {2}.")]
-        public DateTime BirthDate { get; set; }
+        public DateOnly BirthDate { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
         [Display(Name = "Email Address")]
         public string Email { get; set; } = null!;
+
+        [Required]
+        [Display(Name = "Address Line 1")]
+        [MaxLength(100, ErrorMessage = "This field must have {0} characters or less.")]
+        public string Address1 { get; set; } = null!;
+
+        [Display(Name = "Address Line 2 (optional)")]
+        [MaxLength(100, ErrorMessage = "This field must have {0} characters or less.")]
+        public string? Address2 { get; set; }
+
+        [Required]
+        [MaxLength(50, ErrorMessage = "This field must have {0} characters or less.")]
+        public string City { get; set; } = null!;
+
+        [Required]
+        [MaxLength(50, ErrorMessage = "This field must have {0} characters or less.")]
+        public string Country { get; set; } = null!;
     }
 }

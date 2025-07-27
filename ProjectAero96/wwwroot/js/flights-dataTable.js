@@ -68,6 +68,7 @@
         }
         table.ajax.reload();
     }
+    // Clear city filters
     fromSelect.value = "";
     fromSelect.text = "";
     fromSelect.index = "";

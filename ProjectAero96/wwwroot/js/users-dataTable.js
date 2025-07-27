@@ -1,6 +1,6 @@
 ﻿$(function () {
     function getFilteredUsers(json) {
-        const showDisabled = $('#show-disabled').is(':checked');
+        let showDisabled = $('#show-disabled').is(':checked');
         // If checked, show all users; otherwise, hide deleted users
         return json.users.filter(function (user) {
             return showDisabled || !user.deleted;

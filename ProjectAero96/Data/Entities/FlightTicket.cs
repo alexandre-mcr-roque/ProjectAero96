@@ -1,4 +1,6 @@
-﻿namespace ProjectAero96.Data.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ProjectAero96.Data.Entities
 {
     public class FlightTicket
     {
@@ -7,5 +9,8 @@
         public string LastName { get; set; } = null!;
         public int Age { get; set; }
         public string Email { get; set; } = null!;
+        public string SeatNumber { get; set; } = null!;
+        [Column(TypeName = "decimal(8,2)")]
+        public decimal Price { get; set; }
     }
 }

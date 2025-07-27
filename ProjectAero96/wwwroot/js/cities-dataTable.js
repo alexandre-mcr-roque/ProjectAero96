@@ -1,6 +1,6 @@
 ﻿$(function () {
     function getFilteredCities(json) {
-        const showDisabled = $('#show-disabled').is(':checked');
+        let showDisabled = $('#show-disabled').is(':checked');
         // If checked, show all cities; otherwise, hide deleted cities
         return json.cities.filter(function (city) {
             return showDisabled || !city.deleted;

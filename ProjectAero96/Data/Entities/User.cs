@@ -6,7 +6,7 @@ namespace ProjectAero96.Data.Entities
     {
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;
-        public DateTime BirthDate { get; set; } // Stored in UTC time
+        public DateOnly BirthDate { get; set; } // Stored in UTC time
         public string Address1 { get; set; } = null!;
         public string? Address2 { get; set; }
         public string City { get; set; } = null!;
@@ -16,7 +16,5 @@ namespace ProjectAero96.Data.Entities
         public bool Deleted { get; set; }
 
         public string FullName => $"{FirstName} {LastName}";
-
-        public int Age => (int)((DateTime.UtcNow - BirthDate).TotalDays / 365.25); // Calculate age based on birth date
     }
 }

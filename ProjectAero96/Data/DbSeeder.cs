@@ -46,7 +46,7 @@ namespace ProjectAero96.Data
                     UserName = adminEmail,
                     FirstName = "Aero96",
                     LastName = "Administrator",
-                    BirthDate = new DateTime(2002, 9, 9),
+                    BirthDate = new DateOnly(2002, 9, 9),
                     Email = adminEmail,
                     EmailConfirmed = true,  // manually set email as confirmed
                     Address1 = "(Address)",
@@ -147,6 +147,7 @@ namespace ProjectAero96.Data
             string name = $"Test {roleName}";
             var hasher = new PasswordHasher<User>();
             var users = new User[amount];
+            var date = DateOnly.FromDateTime(DateTime.Now.AddYears(-20)); // Set a default birth date for test users
             Parallel.For(1, amount + 1, i =>
             {
                 var email = _email.FormatWith(i);
@@ -155,7 +156,7 @@ namespace ProjectAero96.Data
                     UserName = email,
                     FirstName = name,
                     LastName = i.ToString(),
-                    BirthDate = DateTime.UtcNow.AddYears(-20),
+                    BirthDate = date,
                     Email = email,
                     EmailConfirmed = true,  // manually set email as confirmed
                     Address1 = "(Address)",

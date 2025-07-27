@@ -42,11 +42,14 @@ namespace ProjectAero96.Helpers
                     </div>
                 </center>
                 """ };
-            Array.ForEach(attachments, file => builder.Attachments.Add(file.FileName, file.FileData, ContentType.Parse(file.ContentType)));
+            Array.ForEach(attachments, file => builder.Attachments.Add(file.FileName, file.Content, ContentType.Parse(file.ContentType)));
 
             message.Body = builder.ToMessageBody();
             await smtpClient.SendAsync(message);
         }
+
+        public async Task SendEmailAsync(string to, string subject, string body, IEnumerable<IMailFileModel> attachments)
+            => await SendEmailAsync(to, subject, body, [.. attachments]);
 
         protected virtual void Dispose(bool disposing)
         {

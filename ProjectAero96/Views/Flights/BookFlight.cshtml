@@ -1,0 +1,122 @@
+﻿@model FlightBookingViewModel
+@{
+    ViewBag.Title = "Book Flight";
+}
+
+<partial name="_LoadingIndicatorPartial" />
+<div class="visually-hidden loadingIndicator">
+    <h2 class="text-center">Book Flight</h2>
+    <div class="row m-1">
+        <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+            <partial name="_FormSummaryPartial" />
+            <hr />
+            <form asp-action="BookFlight" method="post">
+                <input asp-for="FlightId" type="hidden" />
+                @if (!User.Identity!.IsAuthenticated || string.IsNullOrEmpty(Model.Email))
+                {
+                    <div class="form-group mb-3">
+                        <label asp-for="FirstName"></label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="LastName"></label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="BirthDate"></label>
+                        <input asp-for="BirthDate" class="form-control" />
+                        <span asp-validation-for="BirthDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Email"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Address1" class="form-label"></label>
+                        <input asp-for="Address1" class="form-control" />
+                        <span asp-validation-for="Address1" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Address2" class="form-label"></label>
+                        <input asp-for="Address2" class="form-control" />
+                        <span asp-validation-for="Address2" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="City" class="form-label"></label>
+                        <input asp-for="City" class="form-control" />
+                        <span asp-validation-for="City" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Country" class="form-label"></label>
+                        <input asp-for="Country" class="form-control" />
+                        <span asp-validation-for="Country" class="text-danger"></span>
+                    </div>
+                    <hr />
+                }
+                else
+                {
+                    <input asp-for="FirstName" type="hidden" />
+                    <input asp-for="LastName" type="hidden" />
+                    <input asp-for="BirthDate" type="hidden" />
+                    <input asp-for="Email" type="hidden" />
+                    <input asp-for="Address1" type="hidden" />
+                    <input asp-for="Address2" type="hidden" />
+                    <input asp-for="City" type="hidden" />
+                    <input asp-for="Country" type="hidden" />
+                }
+                <div class="d-flex flex-column flex-md-row gap-md-4 mb-3">
+                    <h3>Tickets</h3>
+                    <div class="align-content-center"><button type="button" id="add-ticket-btn" class="btn btn-success btn-sm">Add Ticket</button></div>
+                </div>
+                <ul class="list-group" id="ticketsList">
+                    @for (int i = 0; i < Model.Tickets.Count; i++)
+                    {
+                        <li class="list-group-item border rounded px-4 py-2 mb-3" data-index="@i">
+                            <div class="form-group mb-3">
+                                <label for="Tickets[@i].FirstName">First Name</label>
+                                <input class="form-control" type="text" id="Tickets[@i].FirstName" maxlength="100" name="Tickets[@i].FirstName" value="@Model.Tickets.ElementAt(i).FirstName">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Tickets[@i].FirstName" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="Tickets[@i].LastName">Last Name</label>
+                                <input class="form-control" type="text" id="Tickets[@i].LastName" maxlength="100" name="Tickets[@i].LastName" value="@Model.Tickets.ElementAt(i).LastName">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Tickets[@i].LastName" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="Tickets[@i].Email">Email Address</label>
+                                <input class="form-control valid" type="email" id="Tickets[@i].Email" name="Tickets[@i].Email" value="@Model.Tickets.ElementAt(i).Email" aria-describedby="Email-error" aria-invalid="false">
+                                <span class="field-validation-valid" data-valmsg-for="Tickets[@i].Email" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="Tickets[@i].Age">Age</label>
+                                <input class="form-control" type="number" data-val="true" data-val-range="Please insert a valid age." data-val-range-max="200" data-val-range-min="0" data-val-required="The Age field is required." id="Tickets[@i].Age" name="Tickets[@i].Age" value="@Model.Tickets.ElementAt(i).Age"><input name="__Invariant" type="hidden" value="Tickets[@i].Age">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Tickets[@i].Age" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="Tickets[@i].SeatNumber">Seat Number</label>
+                                <input class="form-control" type="text" id="Tickets[@i].SeatNumber" name="Tickets[@i].SeatNumber" value="@Model.Tickets.ElementAt(i).SeatNumber">
+                                <span class="text-danger field-validation-valid" data-valmsg-for="Tickets[@i].SeatNumber" data-valmsg-replace="true"></span>
+                            </div>
+                            @if (i > 0)
+                            {
+                                <button type="button" class="btn btn-danger btn-sm remove-ticket-btn" data-index="@i">
+                                    <i class="bi bi-x"></i> Remove
+                                </button>
+                            }
+                        </li>
+                    }
+                </ul>
+                <button type="submit" class="btn btn-primary">Book Flight</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/book-flight.min.js"></script>
+    <script src="~/js/loading-indicator.min.js"></script>
+}

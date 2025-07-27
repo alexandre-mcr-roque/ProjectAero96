@@ -1,6 +1,7 @@
 ﻿@model FlightViewModel
 @{
     ViewBag.Title = "Edit Flight";
+    bool isEmployee = User.IsInRole("Employee");
 }
 
 <partial name="_LoadingIndicatorPartial" />
@@ -36,6 +37,32 @@
     </div>
 </div>
 
+@section Modals {
+@if (isEmployee)
+{ 
+    @Html.AntiForgeryToken()
+    <div class="modal fade" id="unschedule-modal" tabindex="-1" aria-labelledby="unschedule-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="unschedule-modal-label">Unschedule Flight?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="unschedule-flightid" />
+                    <p>
+                        Are you sure you want to unschedule this flight?
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="confirm-unschedule">Unschedule Flight</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+}
 @section Styles {
     <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/29.1.33/bootstrap5.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css" />
@@ -48,6 +75,6 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.min.js"></script>
     <script src="~/lib/font-awesome/js/all.min.js"></script>
+    <script src="~/js/flights-dataTable@(isEmployee ? "-employee" : "").min.js"></script>
     <script src="~/js/loading-indicator.min.js"></script>
-    <script src="~/js/flights-dataTable@(User.IsInRole("Employee") ? "-employee" : "").js"></script>
 }   

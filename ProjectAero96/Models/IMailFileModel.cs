@@ -4,8 +4,8 @@ namespace ProjectAero96.Models
 {
     public interface IMailFileModel
     {
-        string FileName { get; set; }
-        byte[] FileData { get; set; }
-        string ContentType { get; set; }
+        string FileName { get; }
+        byte[] Content { get; }
+        string ContentType { get; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client.Extensions.Msal;
 using Newtonsoft.Json;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Data.Repositories;
@@ -11,14 +12,20 @@ namespace ProjectAero96.Controllers
     {
         private readonly IFlightsRepository flightsRepository;
         private readonly IAirplanesRepository airplanesRepository;
+        private readonly IMailHelper mailHelper;
+        private readonly IFileHelper fileHelper;
         private readonly IUserHelper userHelper;
 
         public FlightsController(IFlightsRepository flightsRepository,
                                  IAirplanesRepository airplanesRepository,
+                                 IMailHelper mailHelper,
+                                 IFileHelper fileHelper,
                                  IUserHelper userHelper)
         {
             this.flightsRepository = flightsRepository;
             this.airplanesRepository = airplanesRepository;
+            this.mailHelper = mailHelper;
+            this.fileHelper = fileHelper;
             this.userHelper = userHelper;
         }
 
@@ -33,18 +40,19 @@ namespace ProjectAero96.Controllers
         }
 
         [Route("/flights/book/{id:int}")]
-        public async Task<IActionResult> Book(int id)
+        public async Task<IActionResult> BookFlight(int id)
         {
-            // TODO https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
             var flight = await flightsRepository.GetFlightAsync(id);
             if (flight == null)
             {
-                return NotFound();
+                TempData["SummaryStyle"] = 3;
+                TempData["Summary"] = "Flight does not exist.";
+                return RedirectToAction("Index");
             }
 
             var model = new FlightBookingViewModel
             {
-                FlightId = flight.Id
+                FlightId = flight.Id,
             };
             if (User.Identity!.IsAuthenticated)
             {
@@ -55,31 +63,122 @@ namespace ProjectAero96.Controllers
                     model.LastName = user.LastName;
                     model.BirthDate = user.BirthDate;
                     model.Email = user.Email!;
-                    model.Tickets.Add(new FlightBookingViewModel.FlightTicket
-                    {
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Age = user.Age,
-                        Email = user.Email!
-                    });
+                    model.Tickets.ElementAt(0).FirstName = user.FirstName;
+                    model.Tickets.ElementAt(0).LastName = user.LastName;
+                    model.Tickets.ElementAt(0).Email = user.Email!;
+                    model.Tickets.ElementAt(0).Age = user.BirthDate == default ? 0 : DateTime.Now.Year - user.BirthDate.Year - (DateTime.Now.DayOfYear < user.BirthDate.DayOfYear ? 1 : 0);
                 }
-
-            }
-            // Add a default empty ticket if no tickets have been added
-            // (most likely an anonymous booking attempt)
-            if (model.Tickets.Count == 0)
-            {
-                model.Tickets.Add(new FlightBookingViewModel.FlightTicket
-                {
-                    FirstName = string.Empty,
-                    LastName = string.Empty,
-                    Age = 0,
-                    Email = string.Empty
-                });
             }
             return View(model);
         }
 
+        [Route("/flights/book/{id:int}")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> BookFlight(int id, [Bind("FlightId","Tickets","FirstName","LastName","BirthDate","Email")]FlightBookingViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                return View(model);
+            }
+
+            var flight = await flightsRepository.GetFlightAsync(model.FlightId);
+            if (flight == null || id != model.FlightId)
+            {
+                TempData["SummaryStyle"] = 3;
+                TempData["Summary"] = "Flight does not exist.";
+                return RedirectToAction("Index");
+            }
+
+            User? user;
+            if (User.Identity!.IsAuthenticated)
+            {
+                user = await userHelper.FindUserByEmailAsync(User.Identity.Name!);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                user = new User
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    BirthDate = model.BirthDate,
+                    Email = model.Email,
+                    Address1 = model.Address1,
+                    Address2 = model.Address2,
+                    City = model.City,
+                    Country = model.Country,
+                    RequiresPasswordChange = true
+                };
+                var result = await userHelper.AddUserAsync(user);
+                if (!result.Succeeded)
+                {
+                    ViewBag.Summary = FormSummary.Danger("Something wrong happened. Please try again later.");
+                    return View(model);
+                }
+                // TODO send email to set password
+            }
+            var invoice = new Invoice
+            {
+                FlightId = model.FlightId,
+                FlightTickets = model.Tickets.Select(t => new FlightTicket
+                {
+                    FirstName = t.FirstName,
+                    LastName = t.LastName,
+                    Age = t.Age,
+                    Email = t.Email,
+                    SeatNumber = t.SeatNumber ?? string.Empty, // TODO method to generate seat number
+                    Price = t.Age < 2 ? flight.Price * flight.BabyPricePercentage / 100 :
+                            t.Age < 12 ? flight.Price * flight.ChildPricePercentage / 100 : flight.Price
+                }).ToList(),
+                DepartureDate = flight.DepartureDate,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email!,
+                Address1 = user.Address1,
+                Address2 = user.Address2,
+                City = user.City,
+                Country = user.Country
+            };
+            invoice.TotalPrice = invoice.FlightTickets.Sum(t => t.Price);
+
+            var registerResult = await flightsRepository.RegisterFlightTicketsAsync(invoice);
+            if (!registerResult)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened. Please try again later.");
+                return View(model);
+            }
+
+            // TODO send email with invoice details
+            List<IMailFileModel> attachments = new List<IMailFileModel>();
+            foreach (var ticket in invoice.FlightTickets)
+            {
+                var ticketPdf = await fileHelper.GenerateTicketPdfAsync(ticket);
+                attachments.Add(ticketPdf);
+                if (ticket.Email == invoice.Email)
+                {
+                    // Skip sending ticket email to the same address as invoice
+                    continue;
+                }
+                var emailContent = $"Dear {ticket.FirstName} {ticket.LastName},<br/>" +
+                                   $"Thank you for booking your flight with us!<br/>" +
+                                   $"Your flight is scheduled for {flight.DepartureDate:dd/MM/yyyy HH:mm} from {flight.DepartureCity!.Name} to {flight.ArrivalCity!.Name}.<br/>" +
+                                   $"Your seat number is: {ticket.SeatNumber}.<br/>" +
+                                   "We wish you a pleasant journey!";
+                await mailHelper.SendEmailAsync(ticket.Email, "Flight Booking Confirmation", emailContent, ticketPdf);
+            }
+
+            var invoicePdf = await fileHelper.GenerateInvoicePdfAsync(invoice);
+            attachments.Insert(0, invoicePdf);
+            await mailHelper.SendEmailAsync(invoice.Email, "Flight Invoice", "Thank you for your booking. Please find your invoice attached.", attachments);
+
+            TempData["SummaryStyle"] = 2;
+            TempData["Summary"] = "Flight booked successfully. You will receive an email with the details of your booking.";
+            return RedirectToAction("Index");
+        }
 
         //=======================================================
         // CRUD
@@ -227,11 +326,11 @@ namespace ProjectAero96.Controllers
             }
             if (result < flights.Count)
             {
-                ViewBag.Summary = FormSummary.Warning("One or more flights failed to be created.");
+                ViewBag.Summary = FormSummary.Warning("One or more flights failed to be scheduled.");
                 return View(model);
             }
-            if (result == 1) ViewBag.Summary = FormSummary.Success("Flight created successfully.");
-            else ViewBag.Summary = FormSummary.Success("Flights created successfully.");
+            if (result == 1) ViewBag.Summary = FormSummary.Success("Flight scheduled successfully.");
+            else ViewBag.Summary = FormSummary.Success("Flights scheduled successfully.");
             return View(model);
         }
 
@@ -261,7 +360,7 @@ namespace ProjectAero96.Controllers
         [Route("/flights/getall")]
         public async Task<JsonResult> GetFlights(int? from, int? to)
         {
-            var flights = await flightsRepository.GetAllFlightsAsync(from, to);
+            var flights = await flightsRepository.GetFutureFlightsAsync(from, to);
             return Json(new { flights = flights.ToFlightViewModels() });
         }
     }

@@ -22,9 +22,9 @@ namespace ProjectAero96.Models
         [Required]
         [Display(Name = "Birth Date")]
         [DataType(DataType.Date)]
-        [Range(typeof(DateTime), "1900-01-01", "2100-12-31",
+        [Range(typeof(DateOnly), "1900-01-01", "2100-12-31",
             ErrorMessage = "Please enter a valid date between {1} and {2}.")]
-        public DateTime BirthDate { get; set; }
+        public DateOnly BirthDate { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]

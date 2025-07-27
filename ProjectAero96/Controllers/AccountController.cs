@@ -109,8 +109,7 @@ namespace ProjectAero96.Controllers
                 model.ConfirmPassword = string.Empty;
                 return View(model);
             }
-            var birthDate = model.BirthDate.ToUniversalTime();
-            if (birthDate > DateTime.UtcNow.AddYears(-18))
+            if (model.BirthDate.ToDateTime(TimeOnly.MinValue) > DateTime.UtcNow.AddYears(-18))
             {
                 ViewBag.Summary = FormSummary.Danger("You must be at least 18 years old to register an account.");
                 model.Password = string.Empty;
@@ -122,7 +121,7 @@ namespace ProjectAero96.Controllers
                 UserName = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                BirthDate = birthDate,
+                BirthDate = model.BirthDate,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Address1 = model.Address1,

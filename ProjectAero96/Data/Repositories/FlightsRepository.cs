@@ -29,7 +29,7 @@ namespace ProjectAero96.Data.Repositories
                                             .ToListAsync();
         }
 
-        public async Task<ICollection<Flight>> GetAllFlightsWithDeletedAsync(int? departureCity, int? arrivalCity)
+        public async Task<ICollection<Flight>> GetFutureFlightsAsync(int? departureCity, int? arrivalCity)
         {
             if (departureCity != null && arrivalCity != null && departureCity.Value == arrivalCity.Value)
             {
@@ -38,7 +38,9 @@ namespace ProjectAero96.Data.Repositories
             return await dataContext.Flights.AsNoTracking()
                                             .Include(f => f.DepartureCity)
                                             .Include(f => f.ArrivalCity)
-                                            .Where(f => (!departureCity.HasValue || departureCity == 0 || f.DepartureCityId == departureCity.Value)
+                                            .Where(f => !f.Deleted
+                                                        && f.DepartureDate > DateTime.UtcNow
+                                                        && (!departureCity.HasValue || departureCity == 0 || f.DepartureCityId == departureCity.Value)
                                                         && (!arrivalCity.HasValue || arrivalCity == 0 || f.ArrivalCityId == arrivalCity.Value))
                                             .ToListAsync();
         }
@@ -79,7 +81,13 @@ namespace ProjectAero96.Data.Repositories
         {
             return await dataContext.Invoices.AsNoTracking()
                 .AnyAsync(i => i.FlightId == flight.Id
-                                && i.DepartureDay > DateOnly.FromDateTime(DateTime.UtcNow));
+                                && i.DepartureDate > DateTime.UtcNow);
+        }
+
+        public async Task<bool> RegisterFlightTicketsAsync(Invoice invoice)
+        {
+            dataContext.Invoices.Add(invoice);
+            return await dataContext.SaveChangesAsync() > 0;
         }
 
         public async Task<ICollection<SelectListItem>> GetCitySelectListItemsAsync(bool includeEmpty = false)

@@ -47,6 +47,7 @@ namespace ProjectAero96
             // Helpers
             builder.Services.AddScoped<IUserHelper, UserHelper>()
                             .AddScoped<IMailHelper, MailHelper>()
+                            .AddScoped<IFileHelper, FileHelper>()
                             .AddScoped<IImageHelper, ImageHelper>();
 
             builder.Services.AddControllersWithViews();

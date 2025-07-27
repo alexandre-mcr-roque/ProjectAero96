@@ -12,8 +12,8 @@ using ProjectAero96.Data;
 namespace ProjectAero96.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250714140622_RemoveTempInvoice")]
-    partial class RemoveTempInvoice
+    [Migration("20250726220552_InitDb")]
+    partial class InitDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -225,13 +225,13 @@ namespace ProjectAero96.Migrations
                     b.Property<int>("ArrivalCityId")
                         .HasColumnType("int");
 
+                    b.Property<DateTimeOffset>("ArrivalDate")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<byte>("BabyPricePercentage")
                         .HasColumnType("tinyint");
 
                     b.Property<byte>("ChildPricePercentage")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("DayOfWeek")
                         .HasColumnType("tinyint");
 
                     b.Property<bool>("Deleted")
@@ -240,8 +240,8 @@ namespace ProjectAero96.Migrations
                     b.Property<int>("DepartureCityId")
                         .HasColumnType("int");
 
-                    b.Property<TimeOnly>("DepartureTime")
-                        .HasColumnType("time");
+                    b.Property<DateTimeOffset>("DepartureDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<byte>("Hours")
                         .HasColumnType("tinyint");
@@ -271,6 +271,13 @@ namespace ProjectAero96.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -279,6 +286,13 @@ namespace ProjectAero96.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(8,2)");
+
+                    b.Property<string>("SeatNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -312,11 +326,26 @@ namespace ProjectAero96.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateOnly>("DepartureDay")
-                        .HasColumnType("date");
+                    b.Property<DateTimeOffset>("DepartureDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("FlightId")
                         .HasColumnType("int");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(8,2)");
 
                     b.HasKey("Id");
 
@@ -377,6 +406,9 @@ namespace ProjectAero96.Migrations
 
                     b.Property<string>("Address2")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("City")
                         .IsRequired()
