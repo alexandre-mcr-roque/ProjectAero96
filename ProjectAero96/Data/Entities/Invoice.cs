@@ -7,7 +7,10 @@ namespace ProjectAero96.Data.Entities
     {
         public int Id { get; set; }
         public ICollection<FlightTicket> FlightTickets { get; set; } = [];
+        public string DepartureCity { get; set; } = null!;
         public DateTimeOffset DepartureDate { get; set; }
+        public string ArrivalCity { get; set; } = null!;
+        public string FlightDuration { get; set; } = null!; // Expected flight duration as a string
         public int FlightId { get; set; }
         [DeleteBehavior(DeleteBehavior.Restrict)]
         public Flight? Flight { get; set; } = null!;
@@ -20,5 +23,10 @@ namespace ProjectAero96.Data.Entities
         public string Country { get; set; } = null!;
         [Column(TypeName = "decimal(8,2)")]
         public decimal TotalPrice { get; set; }
+        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+        public string FullAddress => string.IsNullOrEmpty(Address2)
+            ? $"{Address1}, {City}, {Country}"
+            : $"{Address1} {Address2}, {City}, {Country}";
     }
 }

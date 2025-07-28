@@ -106,6 +106,7 @@ function storageAvailable(type) {
 function loadValues(bookingData) {
     $('#FirstName').val(bookingData.FirstName);
     $('#LastName').val(bookingData.LastName);
+    $('#Email').val(bookingData.Email);
     $('#BirthDate').val(bookingData.BirthDate);
     $('#Address1').val(bookingData.Address1);
     $('#Address2').val(bookingData.Address2);
@@ -145,9 +146,10 @@ $(function () {
     var bookingData;
     if (storageAvailable("sessionStorage")) {
         // Get account values from input fields
-        let email = $('#Email').val() || "__anonymous__";
+        let email = $('#Email').val();
         let tickets = $.escapeSelector('Tickets[0].');
         bookingData = {
+            sessionUser: email || "__anonymous__",
             FirstName: $('#FirstName').val(),
             LastName: $('#LastName').val(),
             Email: email,
@@ -166,9 +168,13 @@ $(function () {
         };
         let __bookingData = window.sessionStorage.getItem(KEY_SS_BOOKING_DATA);
         if (__bookingData) {
-            bookingData = JSON.parse(__bookingData);
-            if (bookingData.Email == email) loadValues(bookingData);
+            oldBookingData = JSON.parse(__bookingData);
+            if (oldBookingData.sessionUser == bookingData.sessionUser) {
+                bookingData = oldBookingData;
+                loadValues(bookingData);
+            }
         }
+        window.sessionStorage.setItem(KEY_SS_BOOKING_DATA, JSON.stringify(bookingData));
     }
     $(document).on('click', '#add-ticket-btn', function () {
         addTicket();

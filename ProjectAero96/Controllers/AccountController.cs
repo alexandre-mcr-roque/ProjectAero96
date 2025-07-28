@@ -109,7 +109,7 @@ namespace ProjectAero96.Controllers
                 model.ConfirmPassword = string.Empty;
                 return View(model);
             }
-            if (model.BirthDate.ToDateTime(TimeOnly.MinValue) > DateTime.UtcNow.AddYears(-18))
+            if (model.BirthDate.Date > DateTime.UtcNow.AddYears(-18))
             {
                 ViewBag.Summary = FormSummary.Danger("You must be at least 18 years old to register an account.");
                 model.Password = string.Empty;
@@ -121,7 +121,7 @@ namespace ProjectAero96.Controllers
                 UserName = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                BirthDate = model.BirthDate,
+                BirthDate = DateOnly.FromDateTime(model.BirthDate),
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Address1 = model.Address1,
@@ -303,26 +303,20 @@ namespace ProjectAero96.Controllers
                 return NotFound();
             }
 
-            var result = await userHelper.VerifyEmailAsync(user, token);
-            if (!result.Succeeded)
-            {
-                return NotFound();
-            }
-
-            return View();
+            var model = new SetPasswordModel { UserId = uid, Token = token };
+            return View(model);
         }
 
         [Route("/account/setpassword")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetPassword(string? uid, string? token,
-            [Bind("Password","ConfirmPassword")]SetPasswordModel model)
+        public async Task<IActionResult> SetPassword([Bind("Password","ConfirmPassword","UserId","Token")]SetPasswordModel model)
         {
-            if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
+            if (string.IsNullOrEmpty(model.UserId) || string.IsNullOrEmpty(model.Token))
             {
                 return NotFound();
             }
 
-            var user = await userHelper.FindUserByIdAsync(uid);
+            var user = await userHelper.FindUserByIdAsync(model.UserId);
             if (user == null)
             {
                 return NotFound();
@@ -331,6 +325,16 @@ namespace ProjectAero96.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                model.Password = string.Empty;
+                model.ConfirmPassword = string.Empty;
+                return View(model);
+            }
+
+            user.EmailConfirmed = true; // Confirm email address when successfully setting the password
+            var result = await userHelper.ResetPasswordAsync(user, model.Token, model.Password);
+            if (!result.Succeeded)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened. Please try again later.");
                 model.Password = string.Empty;
                 model.ConfirmPassword = string.Empty;
                 return View(model);
@@ -355,26 +359,20 @@ namespace ProjectAero96.Controllers
                 return NotFound();
             }
 
-            var result = await userHelper.VerifyEmailAsync(user, token);
-            if (!result.Succeeded)
-            {
-                return NotFound();
-            }
-
-            return View();
+            var model = new SetPasswordModel { UserId = uid, Token = token };
+            return View(model);
         }
 
         [Route("/account/resetpassword")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(string? uid, string? token,
-            [Bind("Password", "ConfirmPassword")] SetPasswordModel model)
+        public async Task<IActionResult> ResetPassword([Bind("Password","ConfirmPassword","UserId","Token")] SetPasswordModel model)
         {
-            if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
+            if (string.IsNullOrEmpty(model.UserId) || string.IsNullOrEmpty(model.Token))
             {
                 return NotFound();
             }
 
-            var user = await userHelper.FindUserByIdAsync(uid);
+            var user = await userHelper.FindUserByIdAsync(model.UserId);
             if (user == null)
             {
                 return NotFound();
@@ -383,6 +381,15 @@ namespace ProjectAero96.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                model.Password = string.Empty;
+                model.ConfirmPassword = string.Empty;
+                return View(model);
+            }
+
+            var result = await userHelper.ResetPasswordAsync(user, model.Token, model.Password);
+            if (!result.Succeeded)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened. Please try again later.");
                 model.Password = string.Empty;
                 model.ConfirmPassword = string.Empty;
                 return View(model);

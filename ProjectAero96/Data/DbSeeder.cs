@@ -104,6 +104,7 @@ namespace ProjectAero96.Data
                         Country = "Japan"
                     }
                 ]);
+                await dataContext.SaveChangesAsync();
             }
             if (!await dataContext.AirplaneModels.AnyAsync())
             {
@@ -116,6 +117,7 @@ namespace ProjectAero96.Data
                     SeatColumns = 9,
                     WindowSeats = 3
                 });
+                await dataContext.SaveChangesAsync();
             }
             if (!await dataContext.Airplanes.AnyAsync())
             {
@@ -133,8 +135,39 @@ namespace ProjectAero96.Data
                     SeatColumns = 9,
                     WindowSeats = 3
                 });
+                await dataContext.SaveChangesAsync();
             }
-            await dataContext.SaveChangesAsync();
+            if (!await dataContext.Flights.AnyAsync())
+            {
+                var date = DateTimeOffset.UtcNow.AddMonths(2).Date;
+                await dataContext.Flights.AddRangeAsync([
+                    new Flight {
+                        AirplaneId = 1,
+                        DepartureCityId = 1,
+                        ArrivalCityId = 2,
+                        DepartureDate = date.AddHours(8).AddMinutes(30),
+                        ArrivalDate = date.AddHours(10).AddMinutes(30),
+                        Hours = 2,
+                        Minutes = 0,
+                        Price = 2000,
+                        ChildPricePercentage = 90,
+                        BabyPricePercentage = 80
+                    },
+                    new Flight {
+                        AirplaneId = 1,
+                        DepartureCityId = 1,
+                        ArrivalCityId = 2,
+                        DepartureDate = date.AddHours(12),
+                        ArrivalDate = date.AddHours(14),
+                        Hours = 2,
+                        Minutes = 0,
+                        Price = 2000,
+                        ChildPricePercentage = 90,
+                        BabyPricePercentage = 80
+                    }
+                ]);
+                await dataContext.SaveChangesAsync();
+            }
         }
 #if DEBUG
         private readonly string testPassword = "12345Abc";

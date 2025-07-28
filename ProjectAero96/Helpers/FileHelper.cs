@@ -2,6 +2,7 @@
 using ProjectAero96.Models;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf.IO;
 
 namespace ProjectAero96.Helpers
 {
@@ -20,18 +21,20 @@ namespace ProjectAero96.Helpers
             public string ContentType => "application/pdf";
         }
 
-        public async Task<IMailFileModel> GenerateTicketPdfAsync(FlightTicket ticket)
+        private IMailFileModel GenerateTicketPdf(FlightTicket ticket)
         {
             // Create PDF document
             var document = new PdfDocument();
             var page = document.AddPage();
+            page.Size = PdfSharpCore.PageSize.A5;
+            page.Orientation = PdfSharpCore.PageOrientation.Landscape;
             var gfx = XGraphics.FromPdfPage(page);
 
             double y = 40;
             gfx.DrawString("Aero96", FontCompany, XBrushes.DarkBlue, new XRect(0, y, page.Width, 30), XStringFormats.TopCenter);
             y += 35;
             gfx.DrawString("Flight Ticket", FontTitle, XBrushes.Black, new XRect(0, y, page.Width, 30), XStringFormats.TopCenter);
-            y += 40;
+            y += 80;
 
             void DrawField(string label, string value)
             {
@@ -40,7 +43,6 @@ namespace ProjectAero96.Helpers
                 y += 25;
             }
 
-            DrawField("Ticket ID:", ticket.Id.ToString());
             DrawField("First Name:", ticket.FirstName);
             DrawField("Last Name:", ticket.LastName);
             DrawField("Age:", ticket.Age.ToString());
@@ -53,10 +55,12 @@ namespace ProjectAero96.Helpers
             var pdfBytes = stream.ToArray();
 
             var fileName = $"FlightTicket_{ticket.Id}.pdf";
-            return await Task.FromResult(new PdfFile(fileName, pdfBytes));
+            return new PdfFile(fileName, pdfBytes);
         }
+        public async Task<IMailFileModel> GenerateTicketPdfAsync(FlightTicket ticket)
+            => await Task.FromResult(GenerateTicketPdf(ticket));
 
-        public async Task<IMailFileModel> GenerateInvoicePdfAsync(Invoice invoice)
+        private IMailFileModel GenerateInvoicePdf(Invoice invoice)
         {
             // Create PDF document
             var document = new PdfDocument();
@@ -76,24 +80,55 @@ namespace ProjectAero96.Helpers
                 y += 25;
             }
 
-            DrawField("Invoice ID:", invoice.Id.ToString());
+            DrawField("Created At:", invoice.CreatedAt.ToString("yyyy-MM-dd HH:mm"));
             DrawField("First Name:", invoice.FirstName);
             DrawField("Last Name:", invoice.LastName);
             DrawField("Email:", invoice.Email);
-            DrawField("Address 1:", invoice.Address1);
-            DrawField("Address 2:", string.IsNullOrWhiteSpace(invoice.Address2) ? "N/A" : invoice.Address2);
+            DrawField("Address:", invoice.FullAddress);
             DrawField("City:", invoice.City);
             DrawField("Country:", invoice.Country);
-            DrawField("Departure Date:", invoice.DepartureDate.ToString("yyyy-MM-dd HH:mm"));
-            DrawField("Flight ID:", invoice.FlightId.ToString());
+            y += 40;
+            gfx.DrawString("Flight Details", FontTitle, XBrushes.Black, new XRect(0, y, page.Width, 30), XStringFormats.TopCenter);
+            y += 40;
+            DrawField("Departure:", $"{invoice.DepartureCity} at {invoice.DepartureDate:yyyy/MM/dd HH:mm}");
+            DrawField("Arrival:", invoice.ArrivalCity);
+            DrawField("Expected Flight Duration:", invoice.FlightDuration);
+            y += 10;
             DrawField("Total Price:", $"${invoice.TotalPrice:F2}");
 
             using var stream = new MemoryStream();
             document.Save(stream, false);
             var pdfBytes = stream.ToArray();
-        
+
             var fileName = $"Invoice_{invoice.Id}.pdf";
-            return await Task.FromResult(new PdfFile(fileName, pdfBytes));
+            return new PdfFile(fileName, pdfBytes);
         }
+        public async Task<IMailFileModel> GenerateInvoicePdfAsync(Invoice invoice)
+            => await Task.FromResult(GenerateInvoicePdf(invoice));
+
+        private IMailFileModel CombineTicketPdfs(IEnumerable<IMailFileModel> tickets, DateTime dateTime)
+        {
+            var outputDocument = new PdfDocument();
+            foreach (var ticket in tickets)
+            {
+                using var ms = new MemoryStream(ticket.Content);
+                var inputDocument = PdfReader.Open(ms, PdfDocumentOpenMode.Import);
+
+                // Import all pages (should be 1 per ticket)
+                for (int i = 0; i < inputDocument.PageCount; i++)
+                {
+                    outputDocument.AddPage(inputDocument.Pages[i]);
+                }
+            }
+
+            using var outStream = new MemoryStream();
+            outputDocument.Save(outStream, false);
+            var combinedBytes = outStream.ToArray();
+
+            var fileName = $"FlightTickets_{dateTime:yyyyMMddHHmm}.pdf";
+            return new PdfFile(fileName, combinedBytes);
+        }
+        public async Task<IMailFileModel> CombineTicketPdfsAsync(IEnumerable<IMailFileModel> tickets, DateTime dateTime)
+            => await Task.FromResult(CombineTicketPdfs(tickets, dateTime));
     }
 }

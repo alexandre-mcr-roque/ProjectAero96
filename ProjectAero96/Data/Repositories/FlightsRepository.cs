@@ -84,6 +84,15 @@ namespace ProjectAero96.Data.Repositories
                                 && i.DepartureDate > DateTime.UtcNow);
         }
 
+        public async Task<ICollection<Flight>> GetBookedFlightsOfUserAsync(User user)
+        {
+            return await dataContext.Flights.AsNoTracking()
+                .Include(f => f.DepartureCity)
+                .Include(f => f.ArrivalCity)
+                .Where(f => f.Invoices.Any(i => i.Email == user.Email))
+                .ToListAsync();
+        }
+
         public async Task<bool> RegisterFlightTicketsAsync(Invoice invoice)
         {
             dataContext.Invoices.Add(invoice);

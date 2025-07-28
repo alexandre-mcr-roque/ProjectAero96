@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProjectAero96.Data;
 using ProjectAero96.Data.Entities;
 using ProjectAero96.Data.Repositories;
 using ProjectAero96.Helpers;
 using ProjectAero96.Middleware;
 using System.Globalization;
+using System.Text;
 
 namespace ProjectAero96
 {
@@ -38,6 +40,19 @@ namespace ProjectAero96
 
                 options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
             }).AddDefaultTokenProviders().AddEntityFrameworkStores<DataContext>();
+
+            // Used for API authentication
+            builder.Services.AddAuthentication()
+                .AddCookie()
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = builder.Configuration["Tokens:Issuer"],
+                        ValidAudience = builder.Configuration["Tokens:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Tokens:Key"] ?? ""))
+                    };
+                });
 
             // Repositories
             builder.Services.AddScoped<IFlightsRepository, FlightsRepository>()

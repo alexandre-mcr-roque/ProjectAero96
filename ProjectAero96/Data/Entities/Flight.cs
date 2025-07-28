@@ -29,5 +29,7 @@ namespace ProjectAero96.Data.Entities
 
         public int AirplaneId { get; set; }
         public Airplane? Airplane { get; set; }
+
+        public ICollection<Invoice> Invoices { get; set; } = [];
     }
 }

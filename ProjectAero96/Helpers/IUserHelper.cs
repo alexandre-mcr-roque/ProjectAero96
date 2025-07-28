@@ -14,6 +14,7 @@ namespace ProjectAero96.Helpers
         Task<IdentityResult> AddUserAsync(User user, string password);
         Task<IdentityResult> UpdateUserAsync(User user);
         Task<IdentityResult> SetUserDeleted(User user, bool deleted = true);
+        Task<SignInResult> ValidatePasswordAsync(User user, string password);
         Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword);
         Task<string> GenerateVerifyEmailTokenAsync(User user);
         Task<IdentityResult> VerifyEmailAsync(User user, string token);

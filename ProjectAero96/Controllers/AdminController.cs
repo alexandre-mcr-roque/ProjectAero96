@@ -76,7 +76,7 @@ namespace ProjectAero96.Controllers
                 ViewBag.Summary = FormSummary.Danger("There is already a registered account with the given email.");
                 return View(model);
             }
-            if (model.BirthDate.ToDateTime(TimeOnly.MinValue) > DateTime.UtcNow.AddYears(-18) || model.BypassAgeCheck)
+            if (model.BirthDate.Date > DateTime.UtcNow.AddYears(-18) || model.BypassAgeCheck)
             {
                 ViewBag.Summary = FormSummary.Danger("User must be at least 18 years old.");
                 return View(model);
@@ -87,7 +87,7 @@ namespace ProjectAero96.Controllers
                 UserName = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                BirthDate = model.BirthDate,
+                BirthDate = DateOnly.FromDateTime(model.BirthDate),
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Address1 = model.Address1,
@@ -158,7 +158,7 @@ namespace ProjectAero96.Controllers
                 return RedirectToAction("Users");
             }
 
-            if (model.BirthDate.ToDateTime(TimeOnly.MinValue) > DateTime.UtcNow.AddYears(-18) || model.BypassAgeCheck)
+            if (model.BirthDate.Date > DateTime.UtcNow.AddYears(-18) || model.BypassAgeCheck)
             {
                 ViewBag.Summary = FormSummary.Danger("User must be at least 18 years old.");
                 return View(model);
@@ -166,7 +166,7 @@ namespace ProjectAero96.Controllers
 
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
-            user.BirthDate = model.BirthDate;
+            user.BirthDate = DateOnly.FromDateTime(model.BirthDate);
             user.Email = model.Email;
             user.PhoneNumber = model.PhoneNumber;
             user.Address1 = model.Address1;
