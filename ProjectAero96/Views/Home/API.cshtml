@@ -1,0 +1,22 @@
+﻿@{
+    ViewBag.Title = "API";
+}
+
+<h1 class="text-center">Using the API</h1>
+<hr />
+<p>To use the API, you can make requests to the following endpoints:</p>
+<ul>
+    <li class="mb-5">
+        <strong>POST /api/account/createtoken</strong> - Creates a Bearer token if the user credentials are valid.
+        <div class="ms-2 my-2">
+            Expected body:
+        </div>
+        <div class="p-2 bg-black bg-opacity-10 border border-2 border-success rounded">
+            <pre class="m-0">{
+  "email": "user@example.com",
+  "password": "yourPassword123"
+}</pre>
+        </div>
+    </li>
+    <li class="mb-5"><strong>GET /api/flights/booked</strong> - Gets the booked flights. <strong>Requires authentication.</strong></li>
+</ul>

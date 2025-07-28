@@ -67,6 +67,13 @@ namespace ProjectAero96
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddTransient<DbSeeder>();
+
+            // Change access denied urls to not found
+            builder.Services.ConfigureApplicationCookie(cfg =>
+            {
+                cfg.LoginPath = "/error/404"; // Do not challenge
+                cfg.AccessDeniedPath = "/error/404";
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

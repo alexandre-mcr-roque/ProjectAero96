@@ -93,6 +93,31 @@ namespace ProjectAero96.Data.Repositories
                 .ToListAsync();
         }
 
+        public async Task<ICollection<Invoice>> GetInvoicesOfUserAsync
+            (User user, byte option = 1, bool includeTickets = false)
+        {
+            var query = option switch
+            {
+                1 => dataContext.Invoices.AsNoTracking()
+                        .Where(i => i.Email == user.Email && i.DepartureDate <= DateTime.UtcNow),
+                2 => dataContext.Invoices.AsNoTracking()
+                        .Where(i => i.Email == user.Email && i.DepartureDate > DateTime.UtcNow),
+                _ => dataContext.Invoices.AsNoTracking()
+            };
+            if (includeTickets)
+            {
+                return await query.Include(i => i.FlightTickets).ToListAsync();
+            }
+            return await query.ToListAsync();
+        }
+
+        public async Task<Invoice?> GetInvoiceAsync(int id)
+        {
+            return await dataContext.Invoices.AsNoTracking()
+                                             .Include(i => i.FlightTickets)
+                                             .FirstOrDefaultAsync(i => i.Id == id);
+        }
+
         public async Task<bool> RegisterFlightTicketsAsync(Invoice invoice)
         {
             dataContext.Invoices.Add(invoice);

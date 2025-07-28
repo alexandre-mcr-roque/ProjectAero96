@@ -1,6 +1,5 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
-using ProjectAero96.Models;
 
 namespace ProjectAero96.Helpers
 {
@@ -24,7 +23,7 @@ namespace ProjectAero96.Helpers
 
             fromAddress = new MailboxAddress(name, address);
         }
-        public async Task SendEmailAsync(string to, string subject, string body, params IMailFileModel[] attachments)
+        public async Task SendEmailAsync(string to, string subject, string body, params FileData[] attachments)
         {
             var message = new MimeMessage();
             message.From.Add(fromAddress);
@@ -42,13 +41,13 @@ namespace ProjectAero96.Helpers
                     </div>
                 </center>
                 """ };
-            Array.ForEach(attachments, file => builder.Attachments.Add(file.FileName, file.Content, ContentType.Parse(file.ContentType)));
+            Array.ForEach(attachments, file => builder.Attachments.Add(file.Name, file.Content, ContentType.Parse(file.ContentType)));
 
             message.Body = builder.ToMessageBody();
             await smtpClient.SendAsync(message);
         }
 
-        public async Task SendEmailAsync(string to, string subject, string body, IEnumerable<IMailFileModel> attachments)
+        public async Task SendEmailAsync(string to, string subject, string body, IEnumerable<FileData> attachments)
             => await SendEmailAsync(to, subject, body, [.. attachments]);
 
         protected virtual void Dispose(bool disposing)

@@ -197,7 +197,7 @@ namespace ProjectAero96.Controllers
             }
 
             // TODO send email with invoice details
-            List<IMailFileModel> tickets = new List<IMailFileModel>();
+            List<FileData> tickets = new List<FileData>();
             foreach (var ticket in invoice.FlightTickets)
             {
                 var ticketPdf = await fileHelper.GenerateTicketPdfAsync(ticket);

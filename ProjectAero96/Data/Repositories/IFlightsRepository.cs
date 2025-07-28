@@ -14,6 +14,14 @@ namespace ProjectAero96.Data.Repositories
         Task<bool> DeleteFlightAsync(Flight flight);
         Task<bool> HasFlightTicketsAsync(Flight flight);
         Task<ICollection<Flight>> GetBookedFlightsOfUserAsync(User user);
+        /// <summary>
+        /// Options:<br/>
+        /// 0 -> All invoices<br/>
+        /// 1 -> Invoices of past flights<br/>
+        /// 2 -> Invoices of future flights
+        /// </summary>
+        Task<ICollection<Invoice>> GetInvoicesOfUserAsync(User user, byte option = 1, bool includeTickets = false);
+        Task<Invoice?> GetInvoiceAsync(int id);
         Task<bool> RegisterFlightTicketsAsync(Invoice invoice);
         Task<ICollection<SelectListItem>> GetCitySelectListItemsAsync(bool includeEmpty = false);
         Task<ICollection<SelectListItem>> GetAirplaneSelectListItemsAsync();

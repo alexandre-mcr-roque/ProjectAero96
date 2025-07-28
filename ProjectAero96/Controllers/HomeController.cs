@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProjectAero96.Helpers;
 using ProjectAero96.Models;
 using System.Diagnostics;
 
@@ -22,6 +20,12 @@ namespace ProjectAero96.Controllers
 
         [Route("/privacy")]
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [Route("/api")]
+        public IActionResult API()
         {
             return View();
         }

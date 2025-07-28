@@ -22,7 +22,8 @@
         columns: [
             { data: 'departureCity.name' },
             { data: 'arrivalCity.name' },
-            { data: 'price' },
+            { data: (data) => data.departureDate.split('T', 1)[0].replace(/-/g, '/'), className: 'dt-left' },
+            { data: 'price', type: 'num-fmt', className: 'dt-left' },
             {
                 className: 'dt-control',
                 orderable: false,

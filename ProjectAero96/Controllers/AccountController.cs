@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectAero96.Data.Entities;
+using ProjectAero96.Data.Repositories;
 using ProjectAero96.Helpers;
 using ProjectAero96.Models;
 
@@ -8,14 +9,20 @@ namespace ProjectAero96.Controllers
 {
     public class AccountController : Controller
     {
+        private readonly IFlightsRepository flightsRepository;
         private readonly IUserHelper userHelper;
+        private readonly IFileHelper fileHelper;
         private readonly IMailHelper mailHelper;
 
         public AccountController(
+            IFlightsRepository flightsRepository,
             IUserHelper userHelper,
+            IFileHelper fileHelper,
             IMailHelper mailHelper)
         {
+            this.flightsRepository = flightsRepository;
             this.userHelper = userHelper;
+            this.fileHelper = fileHelper;
             this.mailHelper = mailHelper;
         }
 
@@ -212,6 +219,34 @@ namespace ProjectAero96.Controllers
             TempData["SummaryStyle"] = 2;
             TempData["Summary"] = "Information updated successfully.";
             return RedirectToAction("Information");
+        }
+
+        [Authorize]
+        [Route("/account/bookedflights")]
+        public async Task<IActionResult> BookedFlights()
+        {
+            var user = await userHelper.FindUserByEmailAsync(User.Identity!.Name!);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var model = await flightsRepository.GetInvoicesOfUserAsync(user, 2, true);
+            return View(model.ToInvoiceViewModels());
+        }
+
+        [Authorize]
+        [Route("/account/invoices")]
+        public async Task<IActionResult> Invoices()
+        {
+            var user = await userHelper.FindUserByEmailAsync(User.Identity!.Name!);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var model = await flightsRepository.GetInvoicesOfUserAsync(user);
+            return View(model.ToInvoiceViewModels());
         }
 
         [Authorize]
@@ -416,6 +451,42 @@ namespace ProjectAero96.Controllers
                 </p>
                 """;
             await mailHelper.SendEmailAsync(user.Email!, "Aero96 - Reset Password", body);
+        }
+
+        [Authorize]
+        [Route("/account/invoices/{id}")]
+        public async Task<IActionResult> DownloadInvoice(int id)
+        {
+            var invoice = await flightsRepository.GetInvoiceAsync(id);
+            if (invoice == null) return new NoContentResult();
+
+            var user = await userHelper.FindUserByEmailAsync(User.Identity!.Name!);
+            if (user == null) return new NoContentResult();
+
+            if (invoice.Email != user.Email || invoice.FlightTickets.Count == 0) return new NoContentResult();
+
+            var file = await fileHelper.GenerateInvoicePdfAsync(invoice);
+            if (file == null) return new NoContentResult();
+
+            return File(file.Content, file.ContentType, file.Name);
+        }
+
+        [Authorize]
+        [Route("/account/bookedflights/tickets/{id}")]
+        public async Task<IActionResult> DownloadTickets(int id)
+        {
+            var invoice = await flightsRepository.GetInvoiceAsync(id);
+            if (invoice == null) return new NoContentResult();
+
+            var user = await userHelper.FindUserByEmailAsync(User.Identity!.Name!);
+            if (user == null) return new NoContentResult();
+
+            if (invoice.Email != user.Email || invoice.FlightTickets.Count == 0) return new NoContentResult();
+
+            var file = await fileHelper.GenerateTicketPdfsAsync(invoice.FlightTickets, invoice.CreatedAt.DateTime);
+            if (file == null) return new NoContentResult();
+
+            return File(file.Content, file.ContentType, file.Name);
         }
     }
 }

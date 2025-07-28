@@ -235,5 +235,35 @@ namespace ProjectAero96.Helpers
             return flights.Select(f => f.ToFlightViewModel())
                           .ToList();
         }
+
+        //====================================================================
+        // Invoice Converters
+        //====================================================================
+        public static async Task<InvoiceViewModel?> ToInvoiceViewModelAsync(this Task<Invoice?> invoiceT)
+        {
+            var invoice = await invoiceT;
+            if (invoice == null) return null;
+            return invoice.ToInvoiceViewModel();
+        }
+
+        public static InvoiceViewModel ToInvoiceViewModel(this Invoice invoice)
+        {
+            return new InvoiceViewModel
+            {
+                Id = invoice.Id,
+                CreatedAt = invoice.CreatedAt.UtcDateTime,
+                DepartureDate = invoice.DepartureDate.UtcDateTime,
+                DepartureCity = invoice.DepartureCity,
+                ArrivalCity = invoice.ArrivalCity,
+                NumberTickets = invoice.FlightTickets.Count,
+                TotalPrice = $"${invoice.TotalPrice:N2}"
+            };
+        }
+
+        public static ICollection<InvoiceViewModel> ToInvoiceViewModels(this ICollection<Invoice> invoices)
+        {
+            return invoices.Select(i => i.ToInvoiceViewModel())
+                           .ToList();
+        }
     }
 }

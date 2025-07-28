@@ -5,8 +5,9 @@ namespace ProjectAero96.Helpers
 {
     public interface IFileHelper
     {
-        Task<IMailFileModel> GenerateTicketPdfAsync(FlightTicket ticket);
-        Task<IMailFileModel> GenerateInvoicePdfAsync(Invoice invoice);
-        Task<IMailFileModel> CombineTicketPdfsAsync(IEnumerable<IMailFileModel> tickets, DateTime dateTime);
+        Task<FileData> GenerateTicketPdfAsync(FlightTicket ticket);
+        Task<FileData> GenerateTicketPdfsAsync(IEnumerable<FlightTicket> tickets, DateTime dateTime);
+        Task<FileData> CombineTicketPdfsAsync(IEnumerable<FileData> tickets, DateTime dateTime);
+        Task<FileData> GenerateInvoicePdfAsync(Invoice invoice);
     }
 }
