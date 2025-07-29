@@ -30,7 +30,8 @@ function addTicket(data, idx) {
                     </div>
                     <div class="form-group mb-3">
                         <label for="Tickets[${index}].SeatNumber">Seat Number</label>
-                        <input class="form-control" type="text" id="Tickets[${index}].SeatNumber" name="Tickets[${index}].SeatNumber" value="${data.SeatNumber}">
+                        <button type="button" class="form-control text-start" data-bs-target="#seat-map-modal" ticket-index="${index}">${data.SeatNumber || 'None'}</button>
+                        <input type="hidden" id="Tickets[${index}].SeatNumber" name="Tickets[${index}].SeatNumber" value="${data.SeatNumber}">
                         <span class="text-danger field-validation-valid" data-valmsg-for="Tickets[${index}].SeatNumber" data-valmsg-replace="true"></span>
                     </div>
                    <button type="button" class="btn btn-danger btn-sm remove-ticket-btn" data-index="${index}">
@@ -70,7 +71,8 @@ function addTicket(data, idx) {
                     </div>
                     <div class="form-group mb-3">
                         <label for="Tickets[${index}].SeatNumber">Seat Number</label>
-                        <input class="form-control" type="text" id="Tickets[${index}].SeatNumber" name="Tickets[${index}].SeatNumber" value="">
+                        <button type="button" class="form-control text-start" data-bs-target="#seat-map-modal" ticket-index="${index}">None</button>
+                        <input type="hidden" id="Tickets[${index}].SeatNumber" name="Tickets[${index}].SeatNumber" value="">
                         <span class="text-danger field-validation-valid" data-valmsg-for="Tickets[${index}].SeatNumber" data-valmsg-replace="true"></span>
                     </div>
                    <button type="button" class="btn btn-danger btn-sm remove-ticket-btn" data-index="${index}">
@@ -120,16 +122,12 @@ function loadValues(bookingData) {
             $(`#${tickets}Email`).val(ticket.Email);
             $(`#${tickets}Age`).val(ticket.Age);
             $(`#${tickets}SeatNumber`).val(ticket.SeatNumber);
+            $(`button[data-bs-target="#seat-map-modal"][ticket-index="${idx}"]`).text(ticket.SeatNumber || 'None');
         }
         else addTicket(ticket, idx);
     });
 }
 
-/**
- * 
- * @param {HTMLInputElement} element
- * @param {any} bookingData
- */
 function updateValue(element, bookingData) {
     if (element.id.startsWith('Tickets[')) {
         let index = $(element).closest('li').attr('data-index');
@@ -140,6 +138,121 @@ function updateValue(element, bookingData) {
         bookingData[element.id] = $(element).val();
     }
     window.sessionStorage.setItem(KEY_SS_BOOKING_DATA, JSON.stringify(bookingData));
+}
+
+// Helper: Convert zero-indexed seat index to code (e.g., col=2, row=4 => "C5")
+function seatCode(col, row) {
+    return String.fromCharCode(65 + col) + (row + 1);
+}
+// Helper to get the seat code
+function getInputSeat(idx) {
+    let inputName = $.escapeSelector(`Tickets[${idx}].SeatNumber`);
+    return $('#' + inputName).val();
+}
+// Helper to set the seat code
+function setInputSeat(idx, value, bookedSeats) {
+    let inputName = $.escapeSelector(`Tickets[${idx}].SeatNumber`);
+    $('#' + inputName).val(value).trigger('change');
+    bookedSeats[idx] = value;
+    $('#selected-seat-span').text(value || 'None');
+    $(`button[data-bs-target="#seat-map-modal"][ticket-index="${idx}"]`).text(value || 'None');
+}
+
+function renderSeats(flightId, bookedSeats, cfg) {
+    // Fetch occupied seats
+    $.get(`/flights/${flightId}/occupied-seats`, function (occupiedSeats) {
+        const rows = cfg.seatRows;
+        const cols = cfg.seatColumns;
+        const windowSeats = cfg.windowSeats;
+        const rightWindowSeats = cols - windowSeats;
+
+        // Get selected idx
+        let selectedIdx = $('#ticket-idx-modal').val();
+
+        // Clear inputs whose value is now unavailable
+        $('input[id$="SeatNumber"]').each(function () {
+            let $input = $(this);
+            let seat = $input.val();
+            if (occupiedSeats.includes(seat)) {
+                let idx = $input.closest('li').attr('data-index');
+                setInputSeat(idx, '', bookedSeats);
+            }
+        });
+
+        // Build seat map
+        let $map = $('<div id="seat-map"></div>');
+        for (let r = 0; r < rows; r++) {
+            let $row = $('<div class="seat-row"></div>');
+            let $center = $('<div class="seats-center"></div>');
+            let $left = $('<div class="seats-left"></div>');
+            let $right = $('<div class="seats-right"></div>');
+            for (let c = 0; c < cols; c++) {
+                let code = seatCode(c, r);
+                let $seat = $('<div class="seat"></div>');
+                $seat.attr('data-seat', code);
+
+                if (bookedSeats.includes(code)) {
+                    $seat.addClass('occupied');
+                    if (selectedIdx && code === getInputSeat(selectedIdx)) {
+                        $seat.addClass('selected');
+                    }
+                } else if (occupiedSeats.includes(code)) {
+                    $seat.addClass('unavailable');
+                } else {
+                    $seat.addClass('available');
+                }
+
+                if (cols === 1) {
+                    $center.append($seat);
+                }
+                else {
+                    if (c < windowSeats) $left.append($seat);
+                    else if (c >= rightWindowSeats) $right.append($seat);
+                    else $center.append($seat);
+                }
+                if (cols > 1) {
+                    $row.append($left)
+                        .append($center)
+                        .append($right);
+                }
+                else $row.append($center);
+            }
+            $map.append($row);
+        }
+        $('#seat-map').replaceWith($map);
+
+        // Attach click handlers after rendering
+        $('#seat-map .seat.available, #seat-map .seat.selected').off('click')
+            .on('click', function () {
+                let $seat = $(this);
+                if ($seat.hasClass('selected')) {
+                    // Unselect seat for this idx
+                    $seat.removeClass('selected occupied').addClass('available');
+                    setInputSeat(selectedIdx, '', bookedSeats);
+                    return true;
+                }
+                // Unselect previous seat for this idx
+                $('#seat-map .seat.selected').removeClass('selected occupied').addClass('available');
+
+                // Mark this seat as occupied and selected
+                $seat.removeClass('available').addClass('occupied selected');
+
+                // Update the input
+                let seatCodeVal = $seat.data('seat');
+                setInputSeat(selectedIdx, seatCodeVal, bookedSeats);
+            });
+    });
+}
+
+function openModal(element, flightId, bookedSeats, cfg) {
+    let idx = $(element).attr('ticket-index');
+    $('#ticket-idx-modal').val(idx);
+
+    let inputName = $.escapeSelector(`Tickets[${idx}].SeatNumber`);
+    $('#selected-seat-span').text($('#' + inputName).val() || 'None');
+
+    renderSeats(flightId, bookedSeats, cfg);
+    $('#seat-map-modal').modal('show');
 }
 
 $(function () {
@@ -176,6 +289,13 @@ $(function () {
         }
         window.sessionStorage.setItem(KEY_SS_BOOKING_DATA, JSON.stringify(bookingData));
     }
+
+    let flightId = $('#FlightId').val();
+    var bookedSeats = bookingData.Tickets.map(t => t.SeatNumber);
+    $.get(`/flights/${flightId}/seat-config/`, function (config) {
+        $(document).on('click', 'button[data-bs-target="#seat-map-modal"]', function () { openModal(this, flightId, bookedSeats, config) });
+    });
+
     $(document).on('click', '#add-ticket-btn', function () {
         addTicket();
         // Update session storage
@@ -209,17 +329,19 @@ $(function () {
                         $(this).attr('name', prop);
                     }
                 });
+                $(this).find('button[data-bs-target="#seat-map-modal"]').attr('ticket-index', idx);
                 $(this).find('span').attr('data-valmsg-for', prop);
             });
             $(this).find('.remove-ticket-btn').attr('data-index', idx);
         });
         // Update session storage
         bookingData.Tickets.splice(index, 1);
-        window.sessionStorage.setItem(KEY_SS_BOOKING_DATA, bookingData);
+        window.sessionStorage.setItem(KEY_SS_BOOKING_DATA, JSON.stringify(bookingData));
+        // Update booked seats
+        bookedSeats.splice(index, 1);
     });
 
     $('form').on('submit', function () {
-        debugger;
         window.sessionStorage.removeItem(KEY_SS_BOOKING_DATA);
     });
 })

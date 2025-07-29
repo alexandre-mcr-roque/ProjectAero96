@@ -28,7 +28,14 @@ namespace ProjectAero96.Models
             [DataType(DataType.EmailAddress)]
             [Display(Name = "Email Address")]
             public string Email { get; set; } = null!;
+
+            [MinLength(2, ErrorMessage = "Seat {0} is invalid.")]
+            [MaxLength(6, ErrorMessage = "Seat {0} is invalid.")]
             public string? SeatNumber { get; set; }
+
+            public string SeatNumberDisplay => string.IsNullOrWhiteSpace(SeatNumber)
+                ? "None"
+                : SeatNumber;
         }
 
         // Properties for anonymous booking (automatically filled and hidden if user is authenticated)

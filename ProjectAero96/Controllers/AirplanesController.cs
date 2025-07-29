@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProjectAero96.Data.Repositories;
 using ProjectAero96.Helpers;
 
@@ -15,7 +16,6 @@ namespace ProjectAero96.Controllers
             this.airplanesRepository = airplanesRepository;
         }
 
-        [EnumAuthorize(Roles.Employee)]
         [Route("/airplanes/{id}/flights")]
         public async Task<JsonResult> GetFlightsOfAirplane(int id)
         {
@@ -23,7 +23,6 @@ namespace ProjectAero96.Controllers
             return Json(new { flights = flights.ToFlightViewModels() });
         }
 
-        [EnumAuthorize(Roles.Employee)]
         [Route("/airplanes/{id}/price-per-hour")]
         public async Task<JsonResult> GetPricePerHourOfAirplane(int id)
         {

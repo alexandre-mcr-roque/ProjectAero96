@@ -533,13 +533,13 @@ namespace ProjectAero96.Controllers
         // Airplane Models
         //================================================================
         // TODO add index, edit and delete options, and change redirection in post action and view
-        [Route("/admin/airplanemodels/create")]
+        [Route("/admin/airplane-models/create")]
         public IActionResult CreateAirplaneModel()
         {
             return View(new ModelAirplaneViewModel());
         }
 
-        [Route("/admin/airplanemodels/create")]
+        [Route("/admin/airplane-models/create")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateAirplaneModel([Bind("ModelName","ModelNameShort","PricePerHour","MaxSeats","SeatRows","SeatColumns","WindowSeats")] ModelAirplaneViewModel model)
         {
@@ -599,7 +599,7 @@ namespace ProjectAero96.Controllers
             return true;
         }
 
-        [Route("/admin/airplanemodels/seat-config/{id}")]
+        [Route("/admin/airplane-models/seat-config/{id}")]
         public async Task<JsonResult> GetAirplaneModelSeatConfig(int id)
         {
             var airplaneModel = await adminRepository.GetAirplaneModelAsync(id);

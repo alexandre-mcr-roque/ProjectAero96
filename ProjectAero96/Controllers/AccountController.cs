@@ -250,14 +250,14 @@ namespace ProjectAero96.Controllers
         }
 
         [Authorize]
-        [Route("/account/information/changepassword")]
+        [Route("/account/information/change-password")]
         public IActionResult ChangePassword()
         {
             return View();
         }
 
         [Authorize]
-        [Route("/account/information/changepassword")]
+        [Route("/account/information/change-password")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword([Bind("Password","NewPassword","ConfirmPassword")]ChangePasswordModel model)
         {
@@ -324,7 +324,7 @@ namespace ProjectAero96.Controllers
             await mailHelper.SendEmailAsync(user.Email!, "Aero96 - Email Verification", body);
         }
 
-        [Route("/account/setpassword")]
+        [Route("/account/set-password")]
         public async Task<IActionResult> SetPassword(string? uid, string? token)
         {
             if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
@@ -342,7 +342,7 @@ namespace ProjectAero96.Controllers
             return View(model);
         }
 
-        [Route("/account/setpassword")]
+        [Route("/account/set-password")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> SetPassword([Bind("Password","ConfirmPassword","UserId","Token")]SetPasswordModel model)
         {
@@ -380,7 +380,7 @@ namespace ProjectAero96.Controllers
             return RedirectToAction("SignIn");
         }
 
-        [Route("/account/resetpassword")]
+        [Route("/account/reset-password")]
         public async Task<IActionResult> ResetPassword(string? uid, string? token)
         {
             if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
@@ -398,7 +398,7 @@ namespace ProjectAero96.Controllers
             return View(model);
         }
 
-        [Route("/account/resetpassword")]
+        [Route("/account/reset-password")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword([Bind("Password","ConfirmPassword","UserId","Token")] SetPasswordModel model)
         {
@@ -472,7 +472,7 @@ namespace ProjectAero96.Controllers
         }
 
         [Authorize]
-        [Route("/account/bookedflights/tickets/{id}")]
+        [Route("/account/invoices/{id}/tickets")]
         public async Task<IActionResult> DownloadTickets(int id)
         {
             var invoice = await flightsRepository.GetInvoiceAsync(id);

@@ -53,6 +53,14 @@ namespace ProjectAero96.Data.Repositories
                                             .FirstOrDefaultAsync(f => f.Id == id);
         }
 
+        public async Task<Airplane?> GetAirplaneOfFlightAsync(int id)
+        {
+            return await dataContext.Flights.AsNoTracking()
+                                            .Where(f => f.Id == id)
+                                            .Select(f => f.Airplane)
+                                            .FirstOrDefaultAsync();
+        }
+
         public async Task<bool> AddFlightAsync(Flight flight)
         {
             dataContext.Flights.Add(flight);
@@ -75,6 +83,15 @@ namespace ProjectAero96.Data.Repositories
         {
             dataContext.Flights.Remove(flight);
             return await dataContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task<ICollection<string>> GetOccupiedSeatsOfFlightAsync(Flight flight)
+        {
+            return await dataContext.Invoices.AsNoTracking()
+                .Where(i => i.FlightId == flight.Id)
+                .SelectMany(i => i.FlightTickets.Select(ft => ft.SeatNumber))
+                .Distinct()
+                .ToListAsync();
         }
 
         public async Task<bool> HasFlightTicketsAsync(Flight flight)

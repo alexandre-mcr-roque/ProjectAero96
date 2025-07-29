@@ -21,7 +21,7 @@ namespace ProjectAero96.Controllers.API
         }
 
         [HttpPost]
-        [Route("api/account/createtoken")]
+        [Route("api/account/create-token")]
         public async Task<IActionResult> CreateToken([FromBody, Bind("Email,Password")]SignInViewModel model)
         {
             if (model == null || !ModelState.IsValid)

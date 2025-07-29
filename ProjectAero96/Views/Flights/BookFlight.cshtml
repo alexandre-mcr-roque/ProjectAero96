@@ -67,10 +67,7 @@
                     <input asp-for="City" type="hidden" />
                     <input asp-for="Country" type="hidden" />
                 }
-                <div class="d-flex flex-column flex-md-row gap-md-4 mb-3">
-                    <h3>Tickets</h3>
-                    <div class="align-content-center"><button type="button" id="add-ticket-btn" class="btn btn-success btn-sm">Add Ticket</button></div>
-                </div>
+                <h3>Tickets</h3>
                 <ul class="list-group" id="ticketsList">
                     @for (int i = 0; i < Model.Tickets.Count; i++)
                     {
@@ -97,7 +94,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="Tickets[@i].SeatNumber">Seat Number</label>
-                                <input class="form-control" type="text" id="Tickets[@i].SeatNumber" name="Tickets[@i].SeatNumber" value="@Model.Tickets.ElementAt(i).SeatNumber">
+                                <button type="button" class="form-control text-start" data-bs-target="#seat-map-modal" ticket-index="@i">@Model.Tickets.ElementAt(i).SeatNumberDisplay</button>
+                                <input type="hidden" id="Tickets[@i].SeatNumber" name="Tickets[@i].SeatNumber" value="@Model.Tickets.ElementAt(i).SeatNumber">
                                 <span class="text-danger field-validation-valid" data-valmsg-for="Tickets[@i].SeatNumber" data-valmsg-replace="true"></span>
                             </div>
                             @if (i > 0)
@@ -109,14 +107,47 @@
                         </li>
                     }
                 </ul>
-                <button type="submit" class="btn btn-primary">Book Flight</button>
+                <div class="form-group text-center">
+                    <button type="button" id="add-ticket-btn" class="btn btn-success btn-sm">Add Ticket</button>
+                </div>
+                <hr />
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">Book Flight</button>
+                </div>
             </form>
         </div>
     </div>
 </div>
 
+@section Modals {
+    <div class="modal fade" id="seat-map-modal" tabindex="-1" aria-labelledby="seat-map-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-md-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="seat-map-modal-label">Select a Seat</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" class="form-control" id="ticket-idx-modal" />
+                    <center>
+                        <div id="seat-map">
+                        </div>
+                    </center>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <span class="">Selected Seat &nbsp; - &nbsp; <span id="selected-seat-span"></span></span>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/loading-indicator.min.css" />
+    <link rel="stylesheet" href="~/css/seat-config.min.css" />
+}
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="~/js/book-flight.min.js"></script>
+    <script src="~/js/book-flight.js"></script>
     <script src="~/js/loading-indicator.min.js"></script>
 }

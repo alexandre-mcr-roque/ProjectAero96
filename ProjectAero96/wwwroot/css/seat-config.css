@@ -2,10 +2,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #e9ecef;
+    align-content: center;
+    background: rgba(248,249,250,1);
+    border-radius: .25rem;
+    padding: 1rem;
     margin-top: 10px;
     margin-bottom: 10px;
     width: fit-content;
+    min-height: 100px;
+    min-width: 200px;
 }
 
 .seat-row {
@@ -34,3 +39,15 @@
     display: inline-block;
     border: 1px solid #fff;
 }
+
+    .seat.unavailable {
+        background: #adb5bd;
+    }
+
+    .seat.occupied {
+        background: #28a745;
+    }
+
+    .seat.selected {
+        border: 3px solid #343a40;
+    }
