@@ -130,8 +130,7 @@
                 <div class="modal-body">
                     <input type="hidden" class="form-control" id="ticket-idx-modal" />
                     <center>
-                        <div id="seat-map">
-                        </div>
+                        <div id="seat-map"></div>
                     </center>
                 </div>
                 <div class="modal-footer justify-content-between">
@@ -148,6 +147,6 @@
 }
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="~/js/book-flight.js"></script>
+    <script src="~/js/book-flight.min.js"></script>
     <script src="~/js/loading-indicator.min.js"></script>
 }
