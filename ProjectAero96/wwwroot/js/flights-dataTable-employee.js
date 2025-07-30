@@ -41,6 +41,8 @@
             '<dl>' +
                 `<dd>Departure Date: ${new Date(data.departureDate).toLocaleString()}</dd>` +
                 `<dd>Flight Duration: ${data.flightDuration}</dd>` +
+                (data.childPricePercentage < 100 ? `<dd>${100 - data.childPricePercentage}% Off for Children under 12 y.o.</dd>` : '') +
+                (data.babyPricePercentage < 100 ? `<dd>${100 - data.babyPricePercentage}% Off for Children under 2 y.o.</dd>` : '') +
                 `<dd><a href="/flights/book/${data.id}" role="button" class="btn btn-primary btn-sm">Book flight</a> <button id="unschedule-modal-toggle" unschedule-target="${data.id}" type="button" class="btn btn-danger btn-sm">Unschedule flight</a></dd>` +
             '</dl>'
         );

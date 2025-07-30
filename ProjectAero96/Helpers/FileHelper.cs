@@ -129,7 +129,7 @@ namespace ProjectAero96.Helpers
                 y += 25;
             }
 
-            DrawField("Created At:", invoice.CreatedAt.ToString("yyyy-MM-dd HH:mm"));
+            DrawField("Payment Date:", invoice.CreatedAt.ToString("yyyy-MM-dd HH:mm"));
             DrawField("First Name:", invoice.FirstName);
             DrawField("Last Name:", invoice.LastName);
             DrawField("Email:", invoice.Email);
@@ -141,7 +141,7 @@ namespace ProjectAero96.Helpers
             y += 40;
             DrawField("Departure:", $"{invoice.DepartureCity} at {invoice.DepartureDate:yyyy/MM/dd HH:mm}");
             DrawField("Arrival:", invoice.ArrivalCity);
-            DrawField("Expected Flight Duration:", invoice.FlightDuration);
+            DrawField("Flight Duration:", invoice.FlightDuration);
             y += 10;
             DrawField("Total Price:", $"${invoice.TotalPrice:F2}");
 

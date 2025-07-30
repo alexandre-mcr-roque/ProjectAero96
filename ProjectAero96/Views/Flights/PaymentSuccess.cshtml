@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "Payment Confirmed";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-success">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <span class="display-1 text-success">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </span>
+                    </div>
+                    <h2 class="card-title mb-3 text-success">Payment Successful!</h2>
+                    <p class="card-text mb-4">
+                        Thank you for booking your flight with us.<br />
+                        Your payment has been processed successfully.<br />
+                        <br />
+                        An email with the invoice will be sent to your address shortly.
+                    </p>
+                    @if (User.Identity!.IsAuthenticated)
+                    {
+                        <a asp-action="BookedFlights" asp-controller="Account" class="btn btn-success btn-lg mb-2">
+                            View My Booked Flights
+                        </a>
+                    }
+                    <br />
+                    <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary">
+                        Return to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(() => window.localStorage.removeItem('bookingData'));
+    </script>
+}

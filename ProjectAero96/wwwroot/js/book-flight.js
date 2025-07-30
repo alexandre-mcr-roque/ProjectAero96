@@ -1,4 +1,4 @@
-﻿/** SS (Session Storage) Key */ const KEY_SS_BOOKING_DATA = 'bookingData';
+﻿/** LS (Local Storage) Key */ const KEY_LS_BOOKING_DATA = 'bookingData';
 
 function addTicket(data, idx) {
     const $list = $('#ticketsList');
@@ -31,7 +31,7 @@ function addTicket(data, idx) {
                     <div class="form-group mb-3">
                         <label for="Tickets[${index}].SeatNumber">Seat Number</label>
                         <button type="button" class="form-control text-start" data-bs-target="#seat-map-modal" ticket-index="${index}">${data.SeatNumber || 'None'}</button>
-                        <input type="hidden" id="Tickets[${index}].SeatNumber" name="Tickets[${index}].SeatNumber" value="${data.SeatNumber}">
+                        <input class="form-control" type="hidden" id="Tickets[${index}].SeatNumber" name="Tickets[${index}].SeatNumber" value="${data.SeatNumber}">
                         <span class="text-danger field-validation-valid" data-valmsg-for="Tickets[${index}].SeatNumber" data-valmsg-replace="true"></span>
                     </div>
                    <button type="button" class="btn btn-danger btn-sm remove-ticket-btn" data-index="${index}">
@@ -72,7 +72,7 @@ function addTicket(data, idx) {
                     <div class="form-group mb-3">
                         <label for="Tickets[${index}].SeatNumber">Seat Number</label>
                         <button type="button" class="form-control text-start" data-bs-target="#seat-map-modal" ticket-index="${index}">None</button>
-                        <input type="hidden" id="Tickets[${index}].SeatNumber" name="Tickets[${index}].SeatNumber" value="">
+                        <input class="form-control" type="hidden" id="Tickets[${index}].SeatNumber" name="Tickets[${index}].SeatNumber" value="">
                         <span class="text-danger field-validation-valid" data-valmsg-for="Tickets[${index}].SeatNumber" data-valmsg-replace="true"></span>
                     </div>
                    <button type="button" class="btn btn-danger btn-sm remove-ticket-btn" data-index="${index}">
@@ -137,7 +137,7 @@ function updateValue(element, bookingData) {
     else {
         bookingData[element.id] = $(element).val();
     }
-    window.sessionStorage.setItem(KEY_SS_BOOKING_DATA, JSON.stringify(bookingData));
+    window.localStorage.setItem(KEY_LS_BOOKING_DATA, JSON.stringify(bookingData));
 }
 
 // Helper: Convert zero-indexed seat index to code (e.g., col=2, row=4 => "C5")
@@ -152,6 +152,7 @@ function getInputSeat(idx) {
 // Helper to set the seat code
 function setInputSeat(idx, value, bookedSeats) {
     let inputName = $.escapeSelector(`Tickets[${idx}].SeatNumber`);
+    debugger;
     $('#' + inputName).val(value).trigger('change');
     bookedSeats[idx] = value;
     $('#selected-seat-span').text(value || 'None');
@@ -257,7 +258,7 @@ function openModal(element, flightId, bookedSeats, cfg) {
 
 $(function () {
     var bookingData;
-    if (storageAvailable("sessionStorage")) {
+    if (storageAvailable("localStorage")) {
         // Get account values from input fields
         let email = $('#Email').val();
         let tickets = $.escapeSelector('Tickets[0].');
@@ -279,7 +280,7 @@ $(function () {
                 SeatNumber: $(`#${tickets}SeatNumber`).val(),
             }]
         };
-        let __bookingData = window.sessionStorage.getItem(KEY_SS_BOOKING_DATA);
+        let __bookingData = window.localStorage.getItem(KEY_LS_BOOKING_DATA);
         if (__bookingData) {
             oldBookingData = JSON.parse(__bookingData);
             if (oldBookingData.sessionUser == bookingData.sessionUser) {
@@ -287,7 +288,7 @@ $(function () {
                 loadValues(bookingData);
             }
         }
-        window.sessionStorage.setItem(KEY_SS_BOOKING_DATA, JSON.stringify(bookingData));
+        window.localStorage.setItem(KEY_LS_BOOKING_DATA, JSON.stringify(bookingData));
     }
 
     let flightId = $('#FlightId').val();
@@ -298,7 +299,7 @@ $(function () {
 
     $(document).on('click', '#add-ticket-btn', function () {
         addTicket();
-        // Update session storage
+        // Update local storage
         bookingData.Tickets.push({
             FirstName: '',
             LastName: '',
@@ -334,14 +335,10 @@ $(function () {
             });
             $(this).find('.remove-ticket-btn').attr('data-index', idx);
         });
-        // Update session storage
+        // Update local storage
         bookingData.Tickets.splice(index, 1);
-        window.sessionStorage.setItem(KEY_SS_BOOKING_DATA, JSON.stringify(bookingData));
+        window.localStorage.setItem(KEY_LS_BOOKING_DATA, JSON.stringify(bookingData));
         // Update booked seats
         bookedSeats.splice(index, 1);
-    });
-
-    $('form').on('submit', function () {
-        window.sessionStorage.removeItem(KEY_SS_BOOKING_DATA);
     });
 })

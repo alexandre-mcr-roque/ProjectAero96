@@ -6,7 +6,7 @@ namespace ProjectAero96.Models
     public class FlightBookingViewModel
     {
         public int FlightId { get; set; } // Flight ID
-        public ICollection<FlightTicket> Tickets { get; set; } = [new FlightTicket()];
+        public ICollection<FlightTicket> Tickets { get; set; } = [];
 
         public class FlightTicket
         {
@@ -36,6 +36,8 @@ namespace ProjectAero96.Models
             public string SeatNumberDisplay => string.IsNullOrWhiteSpace(SeatNumber)
                 ? "None"
                 : SeatNumber;
+
+            public decimal Price { get; set; }
         }
 
         // Properties for anonymous booking (automatically filled and hidden if user is authenticated)

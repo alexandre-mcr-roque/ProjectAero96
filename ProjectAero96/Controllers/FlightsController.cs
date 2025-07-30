@@ -46,7 +46,7 @@ namespace ProjectAero96.Controllers
             return View(model);
         }
 
-        [Route("/flights/book/{id:int}")]
+        [Route("/flights/book/{id}")]
         public async Task<IActionResult> BookFlight(int id)
         {
             var flight = await flightsRepository.GetFlightAsync(id);
@@ -60,6 +60,7 @@ namespace ProjectAero96.Controllers
             var model = new FlightBookingViewModel
             {
                 FlightId = flight.Id,
+                Tickets = [new FlightBookingViewModel.FlightTicket()]
             };
             if (User.Identity!.IsAuthenticated)
             {
@@ -70,6 +71,10 @@ namespace ProjectAero96.Controllers
                     model.LastName = user.LastName;
                     model.BirthDate = user.BirthDate.ToDateTime(TimeOnly.MinValue);
                     model.Email = user.Email!;
+                    model.Address1 = user.Address1;
+                    model.Address2 = user.Address2;
+                    model.City = user.City;
+                    model.Country = user.Country;
                     model.Tickets.ElementAt(0).FirstName = user.FirstName;
                     model.Tickets.ElementAt(0).LastName = user.LastName;
                     model.Tickets.ElementAt(0).Email = user.Email!;
@@ -79,11 +84,11 @@ namespace ProjectAero96.Controllers
             return View(model);
         }
 
-        [Route("/flights/book/{id:int}")]
+        [Route("/flights/book/{id}")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> BookFlight(int id, [Bind("FlightId","Tickets","FirstName","LastName","BirthDate","Email","Address1","Address2","City","Country")]FlightBookingViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || model.Tickets.Count == 0)
             {
                 ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
                 return View(model);
@@ -155,7 +160,7 @@ namespace ProjectAero96.Controllers
                         return View(model);
                     }
                     var col = (byte)(ticket.SeatNumber[0] - 'A'); // 0-indexed
-                    byte.TryParse(ticket.SeatNumber[1..], out byte row); // 1-indexed
+                    _=byte.TryParse(ticket.SeatNumber[1..], out byte row); // 1-indexed
                     if (col < 0 || col >= airplane.SeatColumns
                     || row < 1 || row > airplane.SeatRows)
                     {
@@ -168,17 +173,98 @@ namespace ProjectAero96.Controllers
                         return View(model);
                     }
                 }
+                // Calculate price
+                ticket.Price = ticket.Age < 2 ? flight.Price * flight.BabyPricePercentage / 100 :
+                            ticket.Age < 12 ? flight.Price * flight.ChildPricePercentage / 100 : flight.Price;
                 occupiedSeats.Add(ticket.SeatNumber!);
             }
+
+            // Check if buyer email already has an account and, if so, check if it matches the signed in user
+            // If the user is not signed in, check if the email is already registered
+            User? user;
+            if (User.Identity!.IsAuthenticated)
+            {
+                user = await userHelper.FindUserByEmailAsync(User.Identity.Name!);
+                if (user == null || user.Email != model.Email)
+                {
+                    // User is signed in but email does not match the account
+                    model.Email = User.Identity.Name!;
+                    ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                    return View(model);
+                }
+            }
+            else
+            {
+                user = await userHelper.FindUserByEmailAsync(model.Email);
+                if (user != null)
+                {
+                    // User is not signed in but email already exists
+                    ViewBag.Summary = FormSummary.Danger("An account with this email already exists. Please sign in to book the flight.");
+                    return View(model);
+                }
+                if (model.BirthDate.Date > DateTime.UtcNow.AddYears(-18))
+                {
+                    ViewBag.Summary = FormSummary.Danger("You must be at least 18 years old to book a flight.");
+                    return View(model);
+                }
+            }
+
+            // Redirect to payment page
+            TempData["PaymentViewModel"] = JsonConvert.SerializeObject(model);
+            return RedirectToAction("Payment", "Flights", new { id = model.FlightId });
+        }
+
+        [Route("/flights/book/{id}/payment")]
+        public IActionResult Payment(int id)
+        {
+            string? flightBookingModel = (string?)TempData["PaymentViewModel"];
+            if (id <= 0 || string.IsNullOrWhiteSpace(flightBookingModel))
+            {
+                return NotFound();
+            }
+            var model = JsonConvert.DeserializeObject<PaymentViewModel>(flightBookingModel);
+            if (model == null)
+            {
+                TempData["SummaryStyle"] = 3;
+                TempData["Summary"] = "Something wrong happened. Please try again.";
+                return RedirectToAction("Index");
+            }
+            return View(model);
+        }
+
+        [Route("/flights/book/{id}/payment")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Payment(int id, [Bind("FlightId","Tickets","FirstName","LastName","BirthDate","Email","Address1","Address2","City","Country","PaymentMethod")]PaymentViewModel model)
+        {
+            if (!ModelState.IsValid || model.Tickets.Count == 0)
+            {
+                ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                return View(model);
+            }
+
+            var flight = await flightsRepository.GetFlightAsync(model.FlightId);
+            if (flight == null)
+            {
+                TempData["SummaryStyle"] = 3;
+                TempData["Summary"] = "Flight does not exist.";
+                return RedirectToAction("Index");
+            }
+
+            //===============================================
+            // Payment procedure should be here
+            //===============================================
 
             // Authenticate user or create a new one
             User? user;
             if (User.Identity!.IsAuthenticated)
             {
                 user = await userHelper.FindUserByEmailAsync(User.Identity.Name!);
-                if (user == null)
+                if (user == null || user.Email != model.Email)
                 {
-                    return NotFound();
+                    // User is signed in but email does not match the account
+                    model.Email = User.Identity.Name!;
+                    ViewBag.Summary = FormSummary.Danger("Something wrong happened.");
+                    return View(model);
                 }
             }
             else
@@ -299,9 +385,19 @@ namespace ProjectAero96.Controllers
             var invoicePdf = await fileHelper.GenerateInvoicePdfAsync(invoice);
             await mailHelper.SendEmailAsync(invoice.Email, "Aero96 - Flight Invoice", "Thank you for your booking. Please find your invoice attached.", invoicePdf, await fileHelper.CombineTicketPdfsAsync(tickets, invoice.CreatedAt.DateTime));
 
-            TempData["SummaryStyle"] = 2;
-            TempData["Summary"] = "Flight booked successfully. You will receive an email with the details of your booking.";
-            return RedirectToAction("Index");
+            TempData["FlightPaymentSuccess"] = "true";
+            return RedirectToAction("PaymentSuccess");
+        }
+
+        [Route("/flights/payment-successful")]
+        public IActionResult PaymentSuccess()
+        {
+            var success = (string?)TempData["FlightPaymentSuccess"];
+            if (success != "true")
+            {
+                return NotFound();
+            }
+            return View();
         }
 
         //=======================================================
