@@ -259,7 +259,6 @@ namespace ProjectAero96.Controllers
             return Ok(user);
         }
 
-        // TODO maybe change text to something more descriptive since this is a new account
         public async Task SendPasswordChangeEmail(User user)
         {
             var tokenLink = Url.Action("SetPassword", "Account", new
@@ -268,14 +267,17 @@ namespace ProjectAero96.Controllers
                 token = await userHelper.GenerateResetPasswordTokenAsync(user)
             }, protocol: HttpContext.Request.Scheme);
             string body = $"""
-                <span style="font-size:2em">Change Password</span>
+                <span style="font-size:2em">New Account</span>
                 <p>
-                    To change your account's password, please click on the following link.
+                    Hello {user.FirstName} {user.LastName},
                     <br><br>
-                    <a style="background-color:#0d6efd;padding:.375em .75em;border-radius:.25em;color:#fff;text-decoration:none;border:1px solid #0d6efd" href="{tokenLink}">Change Password</a>
+                    An account has been created for you by the Aero96 administrators.<br>
+                    To set your account's password, please click on the following link.
+                    <br><br>
+                    <a style="background-color:#0d6efd;padding:.375em .75em;border-radius:.25em;color:#fff;text-decoration:none;border:1px solid #0d6efd" href="{tokenLink}">Set Password</a>
                 </p>
                 """;
-            await mailHelper.SendEmailAsync(user.Email!, "Aero96 - Password Change", body);
+            await mailHelper.SendEmailAsync(user.Email!, "Aero96 - New Account", body);
         }
 
         //================================================================
