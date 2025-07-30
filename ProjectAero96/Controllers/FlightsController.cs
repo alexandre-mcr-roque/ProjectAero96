@@ -329,7 +329,7 @@ namespace ProjectAero96.Controllers
                     LastName = t.LastName,
                     Age = t.Age,
                     Email = t.Email,
-                    SeatNumber = t.SeatNumber ?? string.Empty, // TODO method to generate seat number
+                    SeatNumber = t.SeatNumber!,
                     Price = t.Age < 2 ? flight.Price * flight.BabyPricePercentage / 100 :
                             t.Age < 12 ? flight.Price * flight.ChildPricePercentage / 100 : flight.Price
                 }).ToList(),
@@ -359,7 +359,6 @@ namespace ProjectAero96.Controllers
                 return View(model);
             }
 
-            // TODO send email with invoice details
             List<FileData> tickets = new List<FileData>();
             foreach (var ticket in invoice.FlightTickets)
             {

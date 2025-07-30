@@ -32,14 +32,15 @@
                 </div>
                 <div class="form-group mb-3">
                     <label asp-for="AirlineImage" class="form-label"></label>
-                    <input asp-for="AirlineImage" type="file" class="form-control" />
+                    <span class="text-muted small">Maximum file size: 5MB</span>
+                    <input asp-for="AirlineImage" type="file" class="form-control" data-rule-filetype="png,jpg,jpeg" data-rule-filesize="5242880" data-rule-filerequired />
                     <span asp-validation-for="AirlineImage" class="text-danger"></span>
                 </div>
 
                 <div class="form-group text-center">
                     <button type="submit" class="btn btn-primary">Create Airplane</button>
                     <a asp-action="Airplanes" role="button" class="btn btn-secondary">Return</a>
-                </div>
+                </div>  
             </div>
             <partial name="_SeatConfigurationPartial" />
         </form>
@@ -54,4 +55,5 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/paging-wizard.min.js"></script>
     <script src="~/js/seat-config.min.js"></script>
+    <script src="~/js/jquery-validator-file.min.js"></script>
 }

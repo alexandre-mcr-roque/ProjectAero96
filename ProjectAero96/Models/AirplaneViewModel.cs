@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-using ProjectAero96.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace ProjectAero96.Models

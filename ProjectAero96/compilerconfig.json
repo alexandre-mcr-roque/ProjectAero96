@@ -10,5 +10,9 @@
   {
     "outputFile": "wwwroot/js/seat-config.es5.js",
     "inputFile": "wwwroot/js/seat-config.js"
+  },
+  {
+    "outputFile": "wwwroot/js/jquery-validator-file.es5.js",
+    "inputFile": "wwwroot/js/jquery-validator-file.js"
   }
 ]

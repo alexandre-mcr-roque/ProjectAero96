@@ -1,8 +1,9 @@
 ﻿using Azure.Storage.Blobs;
+using System.Text.RegularExpressions;
 
 namespace ProjectAero96.Helpers
 {
-    public class ImageHelper : IImageHelper
+    public partial class ImageHelper : IImageHelper
     {
         private readonly BlobServiceClient blobService;
 
@@ -39,6 +40,18 @@ namespace ProjectAero96.Helpers
         {
             try
             {
+                if (!ImageFileRegex().IsMatch(image.FileName))
+                {
+                    throw new Exception("Invalid image file format.");
+                }
+                if (image.Length == 0)
+                {
+                    throw new Exception("Empty image file.");
+                }
+                if (image.Length > 5 * 1024 * 1024) // 5 MB limit
+                {
+                    throw new Exception("Image file too big.");
+                }
                 using Stream stream = image.OpenReadStream();
                 return await UploadStreamAsync(stream, containerName, oldImageId);
             }
@@ -53,6 +66,14 @@ namespace ProjectAero96.Helpers
         {
             try
             {
+                if (image.Length == 0)
+                {
+                    throw new Exception("Empty image file.");
+                }
+                if (image.Length > 5 * 1024 * 1024) // 5 MB limit
+                {
+                    throw new Exception("Image file too big.");
+                }
                 using Stream stream = new MemoryStream(image);
                 return await UploadStreamAsync(stream, containerName, oldImageId);
             }
@@ -67,6 +88,27 @@ namespace ProjectAero96.Helpers
         {
             try
             {
+                if (!File.Exists(imageUrl))
+                {
+                    throw new Exception("Image file does not exist.");
+                }
+                var fileInfo = new FileInfo(imageUrl);
+                if ((fileInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    throw new Exception("Image file is a directory.");
+                }
+                if (!ImageFileRegex().IsMatch(fileInfo.Name))
+                {
+                    throw new Exception("Invalid image file format.");
+                }
+                if (fileInfo.Length == 0)
+                {
+                    throw new Exception("Empty image file.");
+                }
+                if (fileInfo.Length > 5 * 1024 * 1024) // 5 MB limit
+                {
+                    throw new Exception("Image file too big.");
+                }
                 using Stream stream = File.OpenRead(imageUrl);
                 return await UploadStreamAsync(stream, containerName, oldImageId);
             }
@@ -98,5 +140,8 @@ namespace ProjectAero96.Helpers
                 System.Diagnostics.Debug.WriteLine($"Error deleting image: {ex.Message}");
             }
         }
+
+        [GeneratedRegex(".+\\.(png|jpeg|jpg)$")]
+        private static partial Regex ImageFileRegex();
     }
 }
